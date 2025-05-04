@@ -1,0 +1,21 @@
+﻿@model MyMVCApp.Models.ErrorViewModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Error</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-danger">Oops! Something went wrong.</h1>
+        <p class="lead">An unexpected error occurred. Please try again later.</p>
+        @if (Model.ShowRequestId)
+        {
+            <p>
+                <strong>Request ID:</strong> <code>@Model.RequestId</code>
+            </p>
+        }
+    </div>
+</body>
+</html>

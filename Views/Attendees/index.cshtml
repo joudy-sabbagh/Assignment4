@@ -1,0 +1,30 @@
+@model IEnumerable<MyMVCApp.Models.Attendee>
+@{
+    ViewData["Title"] = "Attendees";
+}
+
+<h2>Attendees</h2>
+<a class="btn btn-primary" asp-action="Create">Add New Attendee</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var attendee in Model)
+    {
+        <tr>
+            <td>@attendee.Name</td>
+            <td>@attendee.Email</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@attendee.AttendeeId">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@attendee.AttendeeId">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
