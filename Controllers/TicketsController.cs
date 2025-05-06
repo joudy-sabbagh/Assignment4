@@ -14,6 +14,7 @@ namespace MyMVCApp.Controllers
         private readonly CreateTicketHandler _createTicketHandler;
         private readonly UpdateTicketHandler _updateTicketHandler;
         private readonly DeleteTicketHandler _deleteTicketHandler;
+        private readonly GetAllTicketsHandler _getAllTicketsHandler;
 
         public TicketsController(
             ITicketRepository ticketRepo,
@@ -21,7 +22,8 @@ namespace MyMVCApp.Controllers
             IAttendeeRepository attendeeRepo,
             CreateTicketHandler createTicketHandler,
             UpdateTicketHandler updateTicketHandler,
-            DeleteTicketHandler deleteTicketHandler)
+            DeleteTicketHandler deleteTicketHandler,
+            GetAllTicketsHandler getAllTicketsHandler)
         {
             _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
@@ -29,6 +31,7 @@ namespace MyMVCApp.Controllers
             _createTicketHandler = createTicketHandler;
             _updateTicketHandler = updateTicketHandler;
             _deleteTicketHandler = deleteTicketHandler;
+            _getAllTicketsHandler = getAllTicketsHandler;
         }
 
 
@@ -37,42 +40,12 @@ namespace MyMVCApp.Controllers
         public async Task<IActionResult> Index(string sortOrder, int? eventFilter, string categoryFilter)
         {
             ViewData["PriceSortParam"] = sortOrder == "price_asc" ? "price_desc" : "price_asc";
-            ViewData["Events"] = _context.Events.ToList();
+            ViewData["Events"] = await _eventRepo.GetAllAsync();  // Get events from the repository
             ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
 
-            // Parse the category filter.
-            TicketCategory? parsedCategory = null;
-            if (!string.IsNullOrEmpty(categoryFilter) && Enum.TryParse<TicketCategory>(categoryFilter, out TicketCategory cat))
-            {
-                parsedCategory = cat;
-            }
+            var tickets = await _getAllTicketsHandler.Handle(sortOrder, eventFilter, categoryFilter);
 
-            var ticketsQuery = _context.Tickets
-                .Include(t => t.Event)
-                .Include(t => t.Attendee)
-                .AsQueryable();
-
-            if (eventFilter.HasValue)
-            {
-                ticketsQuery = ticketsQuery.Where(t => t.EventId == eventFilter.Value);
-            }
-            if (parsedCategory.HasValue)
-            {
-                ticketsQuery = ticketsQuery.Where(t => t.Category == parsedCategory.Value);
-            }
-
-            // Sort by price (casting to double for SQLite compatibility)
-            switch (sortOrder)
-            {
-                case "price_desc":
-                    ticketsQuery = ticketsQuery.OrderByDescending(t => (double)t.Price);
-                    break;
-                default:
-                    ticketsQuery = ticketsQuery.OrderBy(t => (double)t.Price);
-                    break;
-            }
-
-            return View(await ticketsQuery.ToListAsync());
+            return View(tickets);
         }
 
         // GET: Tickets/Create
