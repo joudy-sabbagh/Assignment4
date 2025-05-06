@@ -10,22 +10,27 @@ namespace MyMVCApp.Controllers
         private readonly IVenueRepository _venueRepo;
         private readonly CreateVenueHandler _createVenueHandler;
         private readonly GetAllVenuesHandler _getAllVenuesHandler;
+        private readonly EditVenueHandler _editVenueHandler;
 
 
         public VenuesController(
             IVenueRepository venueRepo,
             CreateVenueHandler createVenueHandler,
-            GetAllVenuesHandler getAllVenuesHandler)
+            GetAllVenuesHandler getAllVenuesHandler,
+            EditVenueHandler editVenueHandler)
         {
             _venueRepo = venueRepo;
             _createVenueHandler = createVenueHandler;
             _getAllVenuesHandler = getAllVenuesHandler;
+            _editVenueHandler = editVenueHandler;
         }
 
-
         // GET: Venues
-        public async Task<IActionResult> Index() =>
-            View(await _context.Venues.ToListAsync());
+        public async Task<IActionResult> Index()
+        {
+            var venues = await _getAllVenuesHandler.Handle();
+            return View(venues);
+        }
 
         // GET: Venues/Create
         public IActionResult Create() => View();
@@ -64,17 +69,32 @@ namespace MyMVCApp.Controllers
         // POST: Venues/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("VenueId,Name,Location")] Venue venue)
+        public async Task<IActionResult> Edit(int id, UpdateVenueDTO dto)
         {
-            if (id != venue.VenueId)
+            if (id != dto.VenueId)
                 return NotFound();
-            if (ModelState.IsValid)
+
+            var validator = new UpdateVenueValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
             {
-                _context.Update(venue);
-                await _context.SaveChangesAsync();
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                return View(dto);
+            }
+
+            try
+            {
+                await _editVenueHandler.Handle(dto);
                 return RedirectToAction(nameof(Index));
             }
-            return View(venue);
+            catch
+            {
+                ModelState.AddModelError("", "Update failed.");
+                return View(dto);
+            }
         }
 
         // GET: Venues/Delete/5
