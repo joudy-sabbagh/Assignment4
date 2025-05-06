@@ -20,15 +20,15 @@ namespace Application.UseCases.Events
             var newEvent = new Event
             {
                 Name = dto.Name,
-                EventDate = dto.Date,
+                EventDate = dto.EventDate,    
                 NormalPrice = dto.NormalPrice,
-                VIPPrice = dto.VipPrice,
+                VIPPrice = dto.VIPPrice,     
                 BackstagePrice = dto.BackstagePrice,
                 VenueId = dto.VenueId
             };
 
             await _eventRepo.AddAsync(newEvent);
-            return newEvent.Id;
+            return newEvent.EventId;
         }
     }
 }

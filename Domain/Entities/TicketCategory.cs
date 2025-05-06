@@ -1,4 +1,4 @@
-namespace MyMVCApp.Models
+namespace Domain.Entities
 {
     public enum TicketCategory
     {

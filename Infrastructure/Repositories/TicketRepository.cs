@@ -1,54 +1,50 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories;
-
-public class TicketRepository : ITicketRepository
+namespace Infrastructure.Repositories
 {
-    private readonly AppDbContext _context;
-
-    public TicketRepository(AppDbContext context)
+    public class TicketRepository : ITicketRepository
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
+        public TicketRepository(AppDbContext context) => _context = context;
 
-    public async Task<IEnumerable<Ticket>> GetAllAsync()
-    {
-        return await _context.Tickets
-            .Include(t => t.Event)
-            .Include(t => t.Attendee)
-            .ToListAsync();
-    }
+        public async Task<IEnumerable<Ticket>> GetAllAsync() =>
+            await _context.Tickets.ToListAsync();
 
-    public async Task<Ticket?> GetByIdAsync(int id)
-    {
-        return await _context.Tickets
-            .Include(t => t.Event)
-            .Include(t => t.Attendee)
-            .FirstOrDefaultAsync(t => t.TicketId == id);
-    }
+        // Expose a queryable for advanced filtering/sorting with joins
+        public IQueryable<Ticket> GetAllWithEventAndAttendee() =>
+            _context.Tickets
+                    .Include(t => t.Event)
+                    .Include(t => t.Attendee);
 
-    public async Task AddAsync(Ticket ticket)
-    {
-        _context.Tickets.Add(ticket);
-        await _context.SaveChangesAsync();
-    }
+        public async Task<Ticket?> GetByIdAsync(int id) =>
+            await _context.Tickets.FindAsync(id);
 
-    public async Task UpdateAsync(Ticket ticket)
-    {
-        _context.Tickets.Update(ticket);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var ticket = await _context.Tickets.FindAsync(id);
-        if (ticket != null)
+        public async Task AddAsync(Ticket ticket)
         {
-            _context.Tickets.Remove(ticket);
+            await _context.Tickets.AddAsync(ticket);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Ticket ticket)
+        {
+            _context.Tickets.Update(ticket);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _context.Tickets.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

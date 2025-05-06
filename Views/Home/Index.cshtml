@@ -1,0 +1,16 @@
+﻿@*
+    File: Presentation/Views/Home/Index.cshtml
+*@
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<h1>Event Management App</h1>
+<p>Use the links below to get started:</p>
+
+<ul>
+    <li><a asp-controller="Attendees" asp-action="Index">Attendees</a></li>
+    <li><a asp-controller="Venues" asp-action="Index">Venues</a></li>
+    <li><a asp-controller="Events" asp-action="Index">Events</a></li>
+    <li><a asp-controller="Tickets" asp-action="Index">Tickets</a></li>
+</ul>

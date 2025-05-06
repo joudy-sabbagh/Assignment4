@@ -1,48 +1,43 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories;
-
-public class VenueRepository : IVenueRepository
+namespace Infrastructure.Repositories
 {
-    private readonly AppDbContext _context;
-
-    public VenueRepository(AppDbContext context)
+    public class VenueRepository : IVenueRepository
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
+        public VenueRepository(AppDbContext context) => _context = context;
 
-    public async Task<IEnumerable<Venue>> GetAllAsync()
-    {
-        return await _context.Venues.Include(v => v.Events).ToListAsync();
-    }
+        public async Task<IEnumerable<Venue>> GetAllAsync() =>
+            await _context.Venues.ToListAsync();
 
-    public async Task<Venue?> GetByIdAsync(int id)
-    {
-        return await _context.Venues.Include(v => v.Events).FirstOrDefaultAsync(v => v.VenueId == id);
-    }
+        public async Task<Venue?> GetByIdAsync(int id) =>
+            await _context.Venues.FindAsync(id);
 
-    public async Task AddAsync(Venue venue)
-    {
-        _context.Venues.Add(venue);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Venue venue)
-    {
-        _context.Venues.Update(venue);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var venue = await _context.Venues.FindAsync(id);
-        if (venue != null)
+        public async Task AddAsync(Venue venue)
         {
-            _context.Venues.Remove(venue);
+            await _context.Venues.AddAsync(venue);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Venue venue)
+        {
+            _context.Venues.Update(venue);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _context.Venues.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

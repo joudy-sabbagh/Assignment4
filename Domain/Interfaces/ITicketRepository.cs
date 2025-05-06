@@ -1,12 +1,14 @@
-using Core.Entities;
+using Domain.Entities;
 
-namespace Core.Interfaces;
-
-public interface ITicketRepository
+namespace Domain.Interfaces
 {
-    Task<IEnumerable<Ticket>> GetAllAsync();
-    Task<Ticket?> GetByIdAsync(int id);
-    Task AddAsync(Ticket ticket);
-    Task UpdateAsync(Ticket ticket);
-    Task DeleteAsync(int id);
+    public interface ITicketRepository
+    {
+        IQueryable<Ticket> GetAllWithEventAndAttendee();
+        Task<IEnumerable<Ticket>> GetAllAsync();
+        Task<Ticket?> GetByIdAsync(int id);
+        Task AddAsync(Ticket ticket);
+        Task UpdateAsync(Ticket ticket);
+        Task DeleteAsync(int id);
+    }
 }

@@ -1,14 +1,18 @@
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyMVCApp.Models
+namespace Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        {
+        }
 
-        public DbSet<Venue> Venues { get; set; }
-        public DbSet<Event> Events { get; set; }
-        public DbSet<Attendee> Attendees { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Attendee> Attendees { get; set; } = null!;
+        public DbSet<Event> Events { get; set; } = null!;
+        public DbSet<Ticket> Tickets { get; set; } = null!;
+        public DbSet<Venue> Venues { get; set; } = null!;
     }
 }

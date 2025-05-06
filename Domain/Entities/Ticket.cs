@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyMVCApp.Models
+namespace Domain.Entities
 {
     public class Ticket
     {
         public int TicketId { get; set; }
+        public int Id { get => TicketId; set => TicketId = value; }
+        public string TicketType { get; set; } = string.Empty;
+
         // The price will be set automatically based on the Event's pricing.
         public decimal Price { get; set; }
 

@@ -1,11 +1,14 @@
-namespace Application.DTOs;
+using System;
 
-public class CreateEventDTO
+namespace Application.DTOs
 {
-    public string Name { get; set; } = null!;
-    public DateTime Date { get; set; }
-    public decimal NormalPrice { get; set; }
-    public decimal VipPrice { get; set; }
-    public decimal BackstagePrice { get; set; }
-    public int VenueId { get; set; }
+    public class CreateEventDTO
+    {
+        public string Name { get; set; } = string.Empty;
+        public DateTime EventDate { get; set; }
+        public decimal NormalPrice { get; set; }
+        public decimal VIPPrice { get; set; }
+        public decimal BackstagePrice { get; set; }
+        public int VenueId { get; set; }
+    }
 }

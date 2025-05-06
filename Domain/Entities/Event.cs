@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyMVCApp.Models
+namespace Domain.Entities
 {
     public class Event : IValidatableObject
     {
@@ -19,5 +19,11 @@ namespace MyMVCApp.Models
         public Venue? Venue { get; set; }
 
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (EventDate < DateTime.Today)
+                yield return new ValidationResult("Event date must be in the future.", new[] { nameof(EventDate) });
+        }
     }
 }

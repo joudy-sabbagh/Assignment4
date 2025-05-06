@@ -20,9 +20,9 @@ namespace Application.UseCases.Events
             if (ev == null) throw new Exception("Event not found");
 
             ev.Name = dto.Name;
-            ev.EventDate = dto.Date;
+            ev.EventDate = dto.EventDate;   
             ev.NormalPrice = dto.NormalPrice;
-            ev.VIPPrice = dto.VipPrice;
+            ev.VIPPrice = dto.VIPPrice;   
             ev.BackstagePrice = dto.BackstagePrice;
             ev.VenueId = dto.VenueId;
 

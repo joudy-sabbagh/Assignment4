@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.UseCases.Tickets
 {
-    public class GetAllTicketsQuery : IRequest<IEnumerable<Ticket>>
+    public class GetAllTicketsQuery : IRequest<List<Ticket>>
     {
         public string SortOrder { get; }
         public int? EventFilter { get; }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyMVCApp.Models
+namespace Domain.Entities
 {
     public class Attendee
     {
@@ -9,7 +9,13 @@ namespace MyMVCApp.Models
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
 
-        // An Attendee can have many Tickets.
+        // alias so handlers/controllers can use .Id
+        public int Id
+        {
+            get => AttendeeId;
+            set => AttendeeId = value;
+        }
+
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }

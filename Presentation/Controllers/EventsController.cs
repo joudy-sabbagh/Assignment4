@@ -65,21 +65,22 @@ namespace MyMVCApp.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var allEvents = await _mediator.Send(new GetAllEventsQuery());
-            var ev = allEvents.FirstOrDefault(e => e.Id == id);
+            var ev = allEvents.FirstOrDefault(e => e.EventId == id);
 
             if (ev == null)
                 return NotFound();
 
             var dto = new UpdateEventDTO
             {
-                EventId = ev.Id,
+                EventId = ev.EventId,
                 Name = ev.Name,
-                Date = ev.EventDate,
+                EventDate = ev.EventDate,  
                 NormalPrice = ev.NormalPrice,
-                VipPrice = ev.VIPPrice,
+                VIPPrice = ev.VIPPrice,    
                 BackstagePrice = ev.BackstagePrice,
                 VenueId = ev.VenueId
             };
+
 
             ViewData["Venues"] = await _venueRepo.GetAllAsync();
             return View(dto);
@@ -122,7 +123,7 @@ namespace MyMVCApp.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var allEvents = await _mediator.Send(new GetAllEventsQuery());
-            var ev = allEvents.FirstOrDefault(e => e.Id == id);
+            var ev = allEvents.FirstOrDefault(e => e.EventId == id);
 
             if (ev == null)
                 return NotFound();

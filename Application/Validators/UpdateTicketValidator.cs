@@ -1,5 +1,7 @@
-using Application.DTOs;
+using System;                 // for Enum
+using Domain.Entities;       // for TicketCategory
 using FluentValidation;
+using Application.DTOs;
 
 namespace Application.Validators;
 
@@ -12,7 +14,7 @@ public class UpdateTicketValidator : AbstractValidator<UpdateTicketDTO>
         RuleFor(t => t.AttendeeId).GreaterThan(0).WithMessage("Attendee ID must be valid");
         RuleFor(t => t.TicketType)
             .NotEmpty().WithMessage("Ticket type is required")
-            .Must(type => Enum.IsDefined(typeof(TicketCategory), type))
+            .Must(type => Enum.TryParse<TicketCategory>(type, out _))
             .WithMessage("Invalid ticket type");
     }
 }

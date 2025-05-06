@@ -1,0 +1,72 @@
+@model Application.DTOs.UpdateTicketDTO
+@using Domain.Entities
+@using System.Collections.Generic
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Edit Ticket";
+    var events       = ViewData["Events"]    as List<Event>             ?? new List<Event>();
+    var attendees    = ViewData["Attendees"] as List<Attendee>         ?? new List<Attendee>();
+    var categoryList = ViewData["CategoryList"] as IEnumerable<TicketCategory>
+                          ?? Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+}
+
+<h2>Edit Ticket</h2>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="TicketId" />
+
+    <!-- Ticket Type -->
+    <div class="form-group">
+        <label asp-for="TicketType"></label>
+        <select asp-for="TicketType" class="form-control">
+            @foreach (var cat in categoryList)
+            {
+            <option value="@cat" selected="@(cat.ToString() == Model.TicketType)">
+                @cat
+            </option>
+            }
+        </select>
+        <span asp-validation-for="TicketType" class="text-danger"></span>
+    </div>
+
+    <!-- Event Selection -->
+    <div class="form-group">
+        <label asp-for="EventId">Event</label>
+        <select asp-for="EventId" class="form-control">
+            @foreach (var ev in events)
+            {
+            <option value="@ev.EventId" selected="@(ev.EventId == Model.EventId)">
+                @ev.Name
+            </option>
+            }
+        </select>
+        <span asp-validation-for="EventId" class="text-danger"></span>
+    </div>
+
+    <!-- Attendee Selection -->
+    <div class="form-group">
+        <label asp-for="AttendeeId">Attendee</label>
+        <select asp-for="AttendeeId" class="form-control">
+            @foreach (var att in attendees)
+            {
+            <option value="@att.AttendeeId" selected="@(att.AttendeeId == Model.AttendeeId)">
+                @att.Name
+            </option>
+            }
+        </select>
+        <span asp-validation-for="AttendeeId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Update</button>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

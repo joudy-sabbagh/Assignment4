@@ -1,0 +1,24 @@
+@model Application.DTOs.CreateVenueDTO
+@{
+    ViewData["Title"] = "Create Venue";
+}
+
+<h2>Create Venue</h2>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
+
+<partial name="_ValidationScriptsPartial" />
