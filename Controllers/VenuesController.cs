@@ -11,18 +11,21 @@ namespace MyMVCApp.Controllers
         private readonly CreateVenueHandler _createVenueHandler;
         private readonly GetAllVenuesHandler _getAllVenuesHandler;
         private readonly EditVenueHandler _editVenueHandler;
+        private readonly DeleteVenueHandler _deleteVenueHandler;
 
 
         public VenuesController(
             IVenueRepository venueRepo,
             CreateVenueHandler createVenueHandler,
             GetAllVenuesHandler getAllVenuesHandler,
-            EditVenueHandler editVenueHandler)
+            EditVenueHandler editVenueHandler,
+            DeleteVenueHandler deleteVenueHandler)
         {
             _venueRepo = venueRepo;
             _createVenueHandler = createVenueHandler;
             _getAllVenuesHandler = getAllVenuesHandler;
             _editVenueHandler = editVenueHandler;
+            _deleteVenueHandler = deleteVenueHandler;
         }
 
         // GET: Venues
@@ -113,11 +116,7 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var venue = await _context.Venues.FindAsync(id);
-            if (venue == null)
-                return NotFound();
-            _context.Venues.Remove(venue);
-            await _context.SaveChangesAsync();
+            await _deleteVenueHandler.Handle(id);
             return RedirectToAction(nameof(Index));
         }
     }
