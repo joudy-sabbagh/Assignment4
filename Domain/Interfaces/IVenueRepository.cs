@@ -1,6 +1,6 @@
-using Core.Entities;
+using Domain.Entities;
 
-namespace Core.Interfaces;
+namespace Domain.Interfaces;
 
 public interface IVenueRepository
 {
