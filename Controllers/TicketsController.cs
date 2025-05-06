@@ -13,20 +13,24 @@ namespace MyMVCApp.Controllers
         private readonly ITicketRepository _ticketRepo;
         private readonly CreateTicketHandler _createTicketHandler;
         private readonly UpdateTicketHandler _updateTicketHandler;
+        private readonly DeleteTicketHandler _deleteTicketHandler;
 
         public TicketsController(
             ITicketRepository ticketRepo,
             IEventRepository eventRepo,
             IAttendeeRepository attendeeRepo,
             CreateTicketHandler createTicketHandler,
-            UpdateTicketHandler updateTicketHandler)
+            UpdateTicketHandler updateTicketHandler,
+            DeleteTicketHandler deleteTicketHandler)
         {
             _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
             _attendeeRepo = attendeeRepo;
             _createTicketHandler = createTicketHandler;
             _updateTicketHandler = updateTicketHandler;
+            _deleteTicketHandler = deleteTicketHandler;
         }
+
 
 
         // GET: Tickets with filtering and sorting.
@@ -166,11 +170,16 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null) return NotFound();
-            _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _deleteTicketHandler.Handle(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Delete failed.");
+                return RedirectToAction(nameof(Index)); 
+            }
         }
     }
 }
