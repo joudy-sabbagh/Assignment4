@@ -9,14 +9,19 @@ namespace MyMVCApp.Controllers
     {
         private readonly IVenueRepository _venueRepo;
         private readonly CreateVenueHandler _createVenueHandler;
+        private readonly GetAllVenuesHandler _getAllVenuesHandler;
+
 
         public VenuesController(
             IVenueRepository venueRepo,
-            CreateVenueHandler createVenueHandler)
+            CreateVenueHandler createVenueHandler,
+            GetAllVenuesHandler getAllVenuesHandler)
         {
             _venueRepo = venueRepo;
             _createVenueHandler = createVenueHandler;
+            _getAllVenuesHandler = getAllVenuesHandler;
         }
+
 
         // GET: Venues
         public async Task<IActionResult> Index() =>
