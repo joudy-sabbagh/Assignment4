@@ -13,19 +13,22 @@ namespace MyMVCApp.Controllers
         private readonly CreateEventHandler _createEventHandler;
         private readonly GetAllEventsHandler _getAllHandler;
         private readonly EditEventHandler _editEventHandler;
+        private readonly DeleteEventHandler _deleteEventHandler;
 
         public EventsController(
             IEventRepository eventRepo,
             IVenueRepository venueRepo,
             CreateEventHandler createEventHandler,
             GetAllEventsHandler getAllEventsHandler,
-            EditEventHandler editEventHandler)
+            EditEventHandler editEventHandler,
+            DeleteEventHandler deleteEventHandler)
         {
             _eventRepo = eventRepo;
             _venueRepo = venueRepo;
             _createEventHandler = createEventHandler;
             _getAllHandler = getAllEventsHandler;
             _editEventHandler = editEventHandler;
+            _deleteEventHandler = deleteEventHandler;
         }
 
 
@@ -134,7 +137,7 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _eventRepo.DeleteAsync(id);
+            await _deleteEventHandler.Handle(id);
             return RedirectToAction(nameof(Index));
         }
     }
