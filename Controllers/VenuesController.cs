@@ -7,11 +7,15 @@ namespace MyMVCApp.Controllers
 {
     public class VenuesController : Controller
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly IVenueRepository _venueRepo;
+        private readonly CreateVenueHandler _createVenueHandler;
 
-        public EventsController(IEventRepository eventRepo)
+        public VenuesController(
+            IVenueRepository venueRepo,
+            CreateVenueHandler createVenueHandler)
         {
-            _eventRepo = eventRepo;
+            _venueRepo = venueRepo;
+            _createVenueHandler = createVenueHandler;
         }
 
         // GET: Venues
@@ -24,15 +28,21 @@ namespace MyMVCApp.Controllers
         // POST: Venues/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("VenueId,Name,Location")] Venue venue)
+        public async Task<IActionResult> Create(CreateVenueDTO dto)
         {
-            if (ModelState.IsValid)
+            var validator = new CreateVenueValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
             {
-                _context.Add(venue);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                return View(dto);
             }
-            return View(venue);
+
+            await _createVenueHandler.Handle(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Venues/Edit/5
