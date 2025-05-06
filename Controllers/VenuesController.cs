@@ -63,7 +63,7 @@ namespace MyMVCApp.Controllers
         {
             if (id == null)
                 return NotFound();
-            var venue = await _context.Venues.FindAsync(id);
+            var venue = await _venueRepo.GetByIdAsync(id);
             if (venue == null)
                 return NotFound();
             return View(venue);
