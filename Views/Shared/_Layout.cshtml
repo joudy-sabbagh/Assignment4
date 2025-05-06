@@ -2,48 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Event Manager</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] – Event Manager</title>
+
+    <!-- Bootstrap CSS (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384‑ENjdO4Dr2bkBIFxQpeoYkM+FhcXnE1sH1+d5QqoV9Y5nU5mZ5S1m0SB5xHYjkQbi"
+          crossorigin="anonymous">
+
+    <!-- Your custom site CSS -->
+    <link href="~/css/site.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Event Manager</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">Event Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#mainNav" aria-controls="mainNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Venues" asp-action="Index">Venues</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Events" asp-action="Index">Events</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Attendees" asp-action="Index">Attendees</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Tickets" asp-action="Index">Tickets</a>
-                    </li>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Venues" asp-action="Index">Venues</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index">Events</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Attendees" asp-action="Index">Attendees</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Tickets" asp-action="Index">Tickets</a></li>
                 </ul>
             </div>
-        </nav>
-    </header>
-    <div class="container body-content" style="margin-top:20px;">
+        </div>
+    </nav>
+
+    <div class="container my-4">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Event Manager</p>
-        </footer>
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <footer class="bg-light text-center py-3 mt-auto">
+        <div class="container">
+            <small>&copy; @DateTime.Now.Year – Event Manager</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS (bundle includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384‑qQ1fvR0OlyQF1iB60dEzvQZF4zsKIUj4XVoLr49+hgv/ST2eReLpxTURy4y6Z4z4"
+            crossorigin="anonymous"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

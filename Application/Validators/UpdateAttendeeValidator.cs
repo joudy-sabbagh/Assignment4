@@ -8,7 +8,7 @@ namespace Application.Validators
         public UpdateAttendeeValidator()
         {
             RuleFor(x => x.AttendeeId)
-                .GreaterThan(0);
+                .GreaterThanOrEqualTo(0);
 
             RuleFor(x => x.Name)
                 .NotEmpty()

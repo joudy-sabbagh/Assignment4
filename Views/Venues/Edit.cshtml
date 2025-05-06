@@ -19,6 +19,11 @@
         <input asp-for="Location" class="form-control" />
         <span asp-validation-for="Location" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="Capacity"></label>
+        <input asp-for="Capacity" class="form-control" type="number" min="1" />
+        <span asp-validation-for="Capacity" class="text-danger"></span>
+    </div>
     <button type="submit" class="btn btn-warning">Update</button>
 </form>
 

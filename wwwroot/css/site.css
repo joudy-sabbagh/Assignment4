@@ -1,0 +1,10 @@
+/* site.css */
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+}
+
+h2 {
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}

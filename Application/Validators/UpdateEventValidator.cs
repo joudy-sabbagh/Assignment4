@@ -7,7 +7,7 @@ public class UpdateEventValidator : AbstractValidator<UpdateEventDTO>
 {
     public UpdateEventValidator()
     {
-        RuleFor(e => e.EventId).GreaterThan(0);
+        RuleFor(e => e.EventId).GreaterThanOrEqualTo(0);
         RuleFor(e => e.Name).NotEmpty().WithMessage("Name is required");
         RuleFor(e => e.NormalPrice).GreaterThanOrEqualTo(0);
         RuleFor(x => x.EventDate).NotEmpty().WithMessage("Date is required");
