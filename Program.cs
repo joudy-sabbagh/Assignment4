@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MyMVCApp.Models;
 using System.Globalization;
+using Application.Mapping;
+using MediatR;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,9 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Configure SQLite Database
 builder.Services.AddDbContext<AppDbContext>(options =>

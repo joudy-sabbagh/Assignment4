@@ -1,42 +1,44 @@
-namespace Application.UseCases.Tickets;
+using Application.DTOs;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
-public class CreateTicketHandler
+namespace Application.UseCases.Tickets
 {
-    private readonly ITicketRepository _ticketRepo;
-    private readonly IEventRepository _eventRepo;
-    private readonly IAttendeeRepository _attendeeRepo;
-
-    public CreateTicketHandler(
-        ITicketRepository ticketRepo,
-        IEventRepository eventRepo,
-        IAttendeeRepository attendeeRepo)
+    public class CreateTicketHandler : IRequestHandler<CreateTicketCommand, int>
     {
-        _ticketRepo = ticketRepo;
-        _eventRepo = eventRepo;
-        _attendeeRepo = attendeeRepo;
-    }
+        private readonly ITicketRepository _ticketRepo;
+        private readonly IEventRepository _eventRepo;
 
-    public async Task Handle(CreateTicketDTO dto)
-    {
-        var ticket = new Ticket
+        public CreateTicketHandler(ITicketRepository ticketRepo, IEventRepository eventRepo)
         {
-            EventId = dto.EventId,
-            AttendeeId = dto.AttendeeId,
-            TicketType = dto.TicketType
-        };
+            _ticketRepo = ticketRepo;
+            _eventRepo = eventRepo;
+        }
 
-        var ev = await _eventRepo.GetByIdAsync(dto.EventId);
-        if (ev == null)
-            throw new Exception("Event not found");
-
-        ticket.Price = ticket.TicketType switch
+        public async Task<int> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
-            "Normal" => ev.NormalPrice,
-            "VIP" => ev.VIPPrice,
-            "Backstage" => ev.BackstagePrice,
-            _ => ev.NormalPrice
-        };
+            var dto = request.Dto;
 
-        await _ticketRepo.AddAsync(ticket);
+            var ev = await _eventRepo.GetByIdAsync(dto.EventId);
+            if (ev == null) throw new Exception("Event not found");
+
+            var ticket = new Ticket
+            {
+                EventId = dto.EventId,
+                AttendeeId = dto.AttendeeId,
+                TicketType = dto.TicketType,
+                Price = dto.TicketType switch
+                {
+                    "Normal" => ev.NormalPrice,
+                    "VIP" => ev.VIPPrice,
+                    "Backstage" => ev.BackstagePrice,
+                    _ => ev.NormalPrice
+                }
+            };
+
+            await _ticketRepo.AddAsync(ticket);
+            return ticket.Id;
+        }
     }
 }

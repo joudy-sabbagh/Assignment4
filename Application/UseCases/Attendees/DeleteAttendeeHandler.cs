@@ -1,8 +1,9 @@
-using Core.Interfaces;
+using Domain.Interfaces;
+using MediatR;
 
 namespace Application.UseCases.Attendees
 {
-    public class DeleteAttendeeHandler
+    public class DeleteAttendeeHandler : IRequestHandler<DeleteAttendeeCommand>
     {
         private readonly IAttendeeRepository _attendeeRepo;
 
@@ -11,9 +12,9 @@ namespace Application.UseCases.Attendees
             _attendeeRepo = attendeeRepo;
         }
 
-        public async Task Handle(int id)
+        public async Task Handle(DeleteAttendeeCommand request, CancellationToken cancellationToken)
         {
-            await _attendeeRepo.DeleteAsync(id);
+            await _attendeeRepo.DeleteAsync(request.Id);
         }
     }
 }

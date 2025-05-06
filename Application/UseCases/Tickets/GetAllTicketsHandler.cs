@@ -1,41 +1,37 @@
-namespace Application.UseCases.Tickets;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-public class GetAllTicketsHandler
+namespace Application.UseCases.Tickets
 {
-    private readonly ITicketRepository _ticketRepo;
-
-    public GetAllTicketsHandler(ITicketRepository ticketRepo)
+    public class GetAllTicketsHandler : IRequestHandler<GetAllTicketsQuery, IEnumerable<Ticket>>
     {
-        _ticketRepo = ticketRepo;
-    }
+        private readonly ITicketRepository _ticketRepo;
 
-    public async Task<IEnumerable<Ticket>> Handle(string sortOrder, int? eventFilter, string categoryFilter)
-    {
-        var ticketsQuery = _ticketRepo.GetAllWithEventAndAttendee();
-
-        // Apply event filter
-        if (eventFilter.HasValue)
+        public GetAllTicketsHandler(ITicketRepository ticketRepo)
         {
-            ticketsQuery = ticketsQuery.Where(t => t.EventId == eventFilter.Value);
+            _ticketRepo = ticketRepo;
         }
 
-        // Parse category filter
-        if (!string.IsNullOrEmpty(categoryFilter) && Enum.TryParse<TicketCategory>(categoryFilter, out var parsedCategory))
+        public async Task<IEnumerable<Ticket>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
         {
-            ticketsQuery = ticketsQuery.Where(t => t.Category == parsedCategory);
-        }
+            var ticketsQuery = _ticketRepo.GetAllWithEventAndAttendee();
 
-        // Apply sorting by price
-        switch (sortOrder)
-        {
-            case "price_desc":
-                ticketsQuery = ticketsQuery.OrderByDescending(t => (double)t.Price);
-                break;
-            default:
-                ticketsQuery = ticketsQuery.OrderBy(t => (double)t.Price);
-                break;
-        }
+            if (request.EventFilter.HasValue)
+                ticketsQuery = ticketsQuery.Where(t => t.EventId == request.EventFilter.Value);
 
-        return await ticketsQuery.ToListAsync();
+            if (!string.IsNullOrEmpty(request.CategoryFilter) &&
+                Enum.TryParse<TicketCategory>(request.CategoryFilter, out var parsedCategory))
+                ticketsQuery = ticketsQuery.Where(t => t.Category == parsedCategory);
+
+            ticketsQuery = request.SortOrder switch
+            {
+                "price_desc" => ticketsQuery.OrderByDescending(t => (double)t.Price),
+                _ => ticketsQuery.OrderBy(t => (double)t.Price)
+            };
+
+            return await ticketsQuery.ToListAsync();
+        }
     }
 }

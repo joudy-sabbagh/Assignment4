@@ -1,41 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
-using Core.Interfaces;
 using Application.DTOs;
-using Application.UseCases.Events;
 using Application.Validators;
+using Application.UseCases.Events;
+using Domain.Interfaces;
+using MediatR;
 
 namespace MyMVCApp.Controllers
 {
     public class EventsController : Controller
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly IMediator _mediator;
         private readonly IVenueRepository _venueRepo;
-        private readonly CreateEventHandler _createEventHandler;
-        private readonly GetAllEventsHandler _getAllHandler;
-        private readonly EditEventHandler _editEventHandler;
-        private readonly DeleteEventHandler _deleteEventHandler;
 
-        public EventsController(
-            IEventRepository eventRepo,
-            IVenueRepository venueRepo,
-            CreateEventHandler createEventHandler,
-            GetAllEventsHandler getAllEventsHandler,
-            EditEventHandler editEventHandler,
-            DeleteEventHandler deleteEventHandler)
+        public EventsController(IMediator mediator, IVenueRepository venueRepo)
         {
-            _eventRepo = eventRepo;
+            _mediator = mediator;
             _venueRepo = venueRepo;
-            _createEventHandler = createEventHandler;
-            _getAllHandler = getAllEventsHandler;
-            _editEventHandler = editEventHandler;
-            _deleteEventHandler = deleteEventHandler;
         }
-
 
         // GET: Events with search
         public async Task<IActionResult> Index(string searchString)
         {
-            var events = await _getAllHandler.Handle();
+            var events = await _mediator.Send(new GetAllEventsQuery());
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -71,19 +57,32 @@ namespace MyMVCApp.Controllers
                 return View(dto);
             }
 
-            await _createEventHandler.Handle(dto);
+            await _mediator.Send(new CreateEventCommand(dto));
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Events/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var ev = await _eventRepo.GetByIdAsync(id);
+            var allEvents = await _mediator.Send(new GetAllEventsQuery());
+            var ev = allEvents.FirstOrDefault(e => e.Id == id);
+
             if (ev == null)
                 return NotFound();
 
+            var dto = new UpdateEventDTO
+            {
+                EventId = ev.Id,
+                Name = ev.Name,
+                Date = ev.EventDate,
+                NormalPrice = ev.NormalPrice,
+                VipPrice = ev.VIPPrice,
+                BackstagePrice = ev.BackstagePrice,
+                VenueId = ev.VenueId
+            };
+
             ViewData["Venues"] = await _venueRepo.GetAllAsync();
-            return View(ev);
+            return View(dto);
         }
 
         // POST: Events/Edit/5
@@ -100,9 +99,7 @@ namespace MyMVCApp.Controllers
             if (!result.IsValid)
             {
                 foreach (var error in result.Errors)
-                {
                     ModelState.AddModelError(string.Empty, error.ErrorMessage);
-                }
 
                 ViewData["Venues"] = await _venueRepo.GetAllAsync();
                 return View(dto);
@@ -110,7 +107,7 @@ namespace MyMVCApp.Controllers
 
             try
             {
-                await _editEventHandler.Handle(dto);
+                await _mediator.Send(new UpdateEventCommand(dto));
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -121,11 +118,12 @@ namespace MyMVCApp.Controllers
             }
         }
 
-
         // GET: Events/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var ev = await _eventRepo.GetByIdWithVenueAsync(id);
+            var allEvents = await _mediator.Send(new GetAllEventsQuery());
+            var ev = allEvents.FirstOrDefault(e => e.Id == id);
+
             if (ev == null)
                 return NotFound();
 
@@ -137,7 +135,7 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _deleteEventHandler.Handle(id);
+            await _mediator.Send(new DeleteEventCommand(id));
             return RedirectToAction(nameof(Index));
         }
     }

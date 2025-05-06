@@ -1,18 +1,20 @@
-using Core.Interfaces;
+using Domain.Interfaces;
+using MediatR;
 
-namespace Application.UseCases.Events;
-
-public class DeleteEventHandler
+namespace Application.UseCases.Events
 {
-    private readonly IEventRepository _eventRepo;
-
-    public DeleteEventHandler(IEventRepository eventRepo)
+    public class DeleteEventHandler : IRequestHandler<DeleteEventCommand>
     {
-        _eventRepo = eventRepo;
-    }
+        private readonly IEventRepository _eventRepo;
 
-    public async Task Handle(int id)
-    {
-        await _eventRepo.DeleteAsync(id);
+        public DeleteEventHandler(IEventRepository eventRepo)
+        {
+            _eventRepo = eventRepo;
+        }
+
+        public async Task Handle(DeleteEventCommand request, CancellationToken cancellationToken)
+        {
+            await _eventRepo.DeleteAsync(request.Id);
+        }
     }
 }

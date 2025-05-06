@@ -1,9 +1,10 @@
-using Core.Entities;
-using Core.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
 namespace Application.UseCases.Attendees
 {
-    public class GetAllAttendeesHandler
+    public class GetAllAttendeesHandler : IRequestHandler<GetAllAttendeesQuery, List<Attendee>>
     {
         private readonly IAttendeeRepository _attendeeRepo;
 
@@ -12,7 +13,7 @@ namespace Application.UseCases.Attendees
             _attendeeRepo = attendeeRepo;
         }
 
-        public async Task<List<Attendee>> Handle()
+        public async Task<List<Attendee>> Handle(GetAllAttendeesQuery request, CancellationToken cancellationToken)
         {
             return await _attendeeRepo.GetAllAsync();
         }

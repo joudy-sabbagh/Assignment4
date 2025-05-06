@@ -1,26 +1,30 @@
 using Application.DTOs;
-using Core.Entities;
-using Core.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
-namespace Application.UseCases.Venues;
-
-public class CreateVenueHandler
+namespace Application.UseCases.Venues
 {
-    private readonly IVenueRepository _venueRepo;
-
-    public CreateVenueHandler(IVenueRepository venueRepo)
+    public class CreateVenueHandler : IRequestHandler<CreateVenueCommand, int>
     {
-        _venueRepo = venueRepo;
-    }
+        private readonly IVenueRepository _venueRepo;
 
-    public async Task Handle(CreateVenueDTO dto)
-    {
-        var venue = new Venue
+        public CreateVenueHandler(IVenueRepository venueRepo)
         {
-            Name = dto.Name,
-            Capacity = dto.Capacity
-        };
+            _venueRepo = venueRepo;
+        }
 
-        await _venueRepo.AddAsync(venue);
+        public async Task<int> Handle(CreateVenueCommand request, CancellationToken cancellationToken)
+        {
+            var dto = request.Dto;
+            var venue = new Venue
+            {
+                Name = dto.Name,
+                Capacity = dto.Capacity
+            };
+
+            await _venueRepo.AddAsync(venue);
+            return venue.Id;
+        }
     }
 }

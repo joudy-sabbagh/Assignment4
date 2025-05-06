@@ -1,18 +1,20 @@
-using Core.Interfaces;
+using Domain.Interfaces;
+using MediatR;
 
-namespace Application.UseCases.Venues;
-
-public class DeleteVenueHandler
+namespace Application.UseCases.Venues
 {
-    private readonly IVenueRepository _venueRepo;
-
-    public DeleteVenueHandler(IVenueRepository venueRepo)
+    public class DeleteVenueHandler : IRequestHandler<DeleteVenueCommand>
     {
-        _venueRepo = venueRepo;
-    }
+        private readonly IVenueRepository _venueRepo;
 
-    public async Task Handle(int id)
-    {
-        await _venueRepo.DeleteAsync(id);
+        public DeleteVenueHandler(IVenueRepository venueRepo)
+        {
+            _venueRepo = venueRepo;
+        }
+
+        public async Task Handle(DeleteVenueCommand request, CancellationToken cancellationToken)
+        {
+            await _venueRepo.DeleteAsync(request.Id);
+        }
     }
 }

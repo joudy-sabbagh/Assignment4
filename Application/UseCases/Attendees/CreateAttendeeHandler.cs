@@ -1,10 +1,11 @@
-using Core.Entities;
-using Core.Interfaces;
 using Application.DTOs;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
 namespace Application.UseCases.Attendees
 {
-    public class CreateAttendeeHandler
+    public class CreateAttendeeHandler : IRequestHandler<CreateAttendeeCommand, int>
     {
         private readonly IAttendeeRepository _attendeeRepo;
 
@@ -13,15 +14,16 @@ namespace Application.UseCases.Attendees
             _attendeeRepo = attendeeRepo;
         }
 
-        public async Task Handle(CreateAttendeeDTO dto)
+        public async Task<int> Handle(CreateAttendeeCommand request, CancellationToken cancellationToken)
         {
             var attendee = new Attendee
             {
-                Name = dto.Name,
-                Email = dto.Email
+                Name = request.Dto.Name,
+                Email = request.Dto.Email
             };
 
             await _attendeeRepo.AddAsync(attendee);
+            return attendee.Id;
         }
     }
 }

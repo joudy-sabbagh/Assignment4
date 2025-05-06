@@ -1,19 +1,21 @@
-using Core.Entities;
-using Core.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
-namespace Application.UseCases.Events;
-
-public class GetAllEventsHandler
+namespace Application.UseCases.Events
 {
-    private readonly IEventRepository _eventRepo;
-
-    public GetAllEventsHandler(IEventRepository eventRepo)
+    public class GetAllEventsHandler : IRequestHandler<GetAllEventsQuery, List<Event>>
     {
-        _eventRepo = eventRepo;
-    }
+        private readonly IEventRepository _eventRepo;
 
-    public async Task<List<Event>> Handle()
-    {
-        return await _eventRepo.GetAllAsync();
+        public GetAllEventsHandler(IEventRepository eventRepo)
+        {
+            _eventRepo = eventRepo;
+        }
+
+        public async Task<List<Event>> Handle(GetAllEventsQuery request, CancellationToken cancellationToken)
+        {
+            return await _eventRepo.GetAllAsync();
+        }
     }
 }

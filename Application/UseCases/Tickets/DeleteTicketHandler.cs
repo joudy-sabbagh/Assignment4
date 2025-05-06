@@ -1,20 +1,23 @@
-namespace Application.UseCases.Tickets;
+using Domain.Interfaces;
+using MediatR;
 
-public class DeleteTicketHandler
+namespace Application.UseCases.Tickets
 {
-    private readonly ITicketRepository _ticketRepo;
-
-    public DeleteTicketHandler(ITicketRepository ticketRepo)
+    public class DeleteTicketHandler : IRequestHandler<DeleteTicketCommand>
     {
-        _ticketRepo = ticketRepo;
-    }
+        private readonly ITicketRepository _ticketRepo;
 
-    public async Task Handle(int ticketId)
-    {
-        var ticket = await _ticketRepo.GetByIdAsync(ticketId);
-        if (ticket == null)
-            throw new Exception("Ticket not found");
+        public DeleteTicketHandler(ITicketRepository ticketRepo)
+        {
+            _ticketRepo = ticketRepo;
+        }
 
-        await _ticketRepo.DeleteAsync(ticketId);
+        public async Task Handle(DeleteTicketCommand request, CancellationToken cancellationToken)
+        {
+            var ticket = await _ticketRepo.GetByIdAsync(request.TicketId);
+            if (ticket == null) throw new Exception("Ticket not found");
+
+            await _ticketRepo.DeleteAsync(request.TicketId);
+        }
     }
 }

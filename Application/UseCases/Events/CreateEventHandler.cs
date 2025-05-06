@@ -1,30 +1,34 @@
 using Application.DTOs;
-using Core.Entities;
-using Core.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
+using MediatR;
 
-namespace Application.UseCases.Events;
-
-public class CreateEventHandler
+namespace Application.UseCases.Events
 {
-    private readonly IEventRepository _eventRepo;
-
-    public CreateEventHandler(IEventRepository eventRepo)
+    public class CreateEventHandler : IRequestHandler<CreateEventCommand, int>
     {
-        _eventRepo = eventRepo;
-    }
+        private readonly IEventRepository _eventRepo;
 
-    public async Task Handle(CreateEventDTO dto)
-    {
-        var newEvent = new Event
+        public CreateEventHandler(IEventRepository eventRepo)
         {
-            Name = dto.Name,
-            Date = dto.Date,
-            NormalPrice = dto.NormalPrice,
-            VipPrice = dto.VipPrice,
-            BackstagePrice = dto.BackstagePrice,
-            VenueId = dto.VenueId
-        };
+            _eventRepo = eventRepo;
+        }
 
-        await _eventRepo.AddAsync(newEvent);
+        public async Task<int> Handle(CreateEventCommand request, CancellationToken cancellationToken)
+        {
+            var dto = request.Dto;
+            var newEvent = new Event
+            {
+                Name = dto.Name,
+                EventDate = dto.Date,
+                NormalPrice = dto.NormalPrice,
+                VIPPrice = dto.VipPrice,
+                BackstagePrice = dto.BackstagePrice,
+                VenueId = dto.VenueId
+            };
+
+            await _eventRepo.AddAsync(newEvent);
+            return newEvent.Id;
+        }
     }
 }

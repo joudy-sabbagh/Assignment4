@@ -1,37 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using Core.Interfaces;
 using Application.DTOs;
 using Application.UseCases.Attendees;
 using Application.Validators;
+using MediatR;
 
 namespace MyMVCApp.Controllers
 {
     public class AttendeesController : Controller
     {
-        private readonly IAttendeeRepository _attendeeRepo;
-        private readonly CreateAttendeeHandler _createHandler;
-        private readonly UpdateAttendeeHandler _updateHandler;
-        private readonly DeleteAttendeeHandler _deleteHandler;
-        private readonly GetAllAttendeesHandler _getAllHandler;
+        private readonly IMediator _mediator;
 
-        public AttendeesController(
-            IAttendeeRepository attendeeRepo,
-            CreateAttendeeHandler createHandler,
-            UpdateAttendeeHandler updateHandler,
-            DeleteAttendeeHandler deleteHandler,
-            GetAllAttendeesHandler getAllHandler)
+        public AttendeesController(IMediator mediator)
         {
-            _attendeeRepo = attendeeRepo;
-            _createHandler = createHandler;
-            _updateHandler = updateHandler;
-            _deleteHandler = deleteHandler;
-            _getAllHandler = getAllHandler;
+            _mediator = mediator;
         }
 
         // GET: Attendees
         public async Task<IActionResult> Index()
         {
-            var attendees = await _getAllHandler.Handle();
+            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
             return View(attendees);
         }
 
@@ -54,17 +41,27 @@ namespace MyMVCApp.Controllers
                 return View(dto);
             }
 
-            await _createHandler.Handle(dto);
+            await _mediator.Send(new CreateAttendeeCommand(dto));
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Attendees/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var attendee = await _attendeeRepo.GetByIdAsync(id);
+            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
+            var attendee = attendees.FirstOrDefault(a => a.Id == id);
+
             if (attendee == null)
                 return NotFound();
-            return View(attendee);
+
+            var dto = new UpdateAttendeeDTO
+            {
+                AttendeeId = attendee.Id,
+                Name = attendee.Name,
+                Email = attendee.Email
+            };
+
+            return View(dto);
         }
 
         // POST: Attendees/Edit/5
@@ -86,16 +83,19 @@ namespace MyMVCApp.Controllers
                 return View(dto);
             }
 
-            await _updateHandler.Handle(dto);
+            await _mediator.Send(new UpdateAttendeeCommand(dto));
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Attendees/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var attendee = await _attendeeRepo.GetByIdAsync(id);
+            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
+            var attendee = attendees.FirstOrDefault(a => a.Id == id);
+
             if (attendee == null)
                 return NotFound();
+
             return View(attendee);
         }
 
@@ -104,7 +104,7 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _deleteHandler.Handle(id);
+            await _mediator.Send(new DeleteAttendeeCommand(id));
             return RedirectToAction(nameof(Index));
         }
     }
