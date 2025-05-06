@@ -12,23 +12,27 @@ namespace MyMVCApp.Controllers
         private readonly IVenueRepository _venueRepo;
         private readonly CreateEventHandler _createEventHandler;
         private readonly GetAllEventsHandler _getAllHandler;
+        private readonly EditEventHandler _editEventHandler;
 
         public EventsController(
             IEventRepository eventRepo,
             IVenueRepository venueRepo,
             CreateEventHandler createEventHandler,
-            GetAllEventsHandler getAllEventsHandler)
+            GetAllEventsHandler getAllEventsHandler,
+            EditEventHandler editEventHandler)
         {
             _eventRepo = eventRepo;
             _venueRepo = venueRepo;
             _createEventHandler = createEventHandler;
             _getAllHandler = getAllEventsHandler;
+            _editEventHandler = editEventHandler;
         }
+
 
         // GET: Events with search
         public async Task<IActionResult> Index(string searchString)
         {
-            var events = await _eventRepo.GetAllWithVenueAsync();
+            var events = await _getAllHandler.Handle();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -82,23 +86,38 @@ namespace MyMVCApp.Controllers
         // POST: Events/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Event ev)
+        public async Task<IActionResult> Edit(int id, UpdateEventDTO dto)
         {
-            if (id != ev.EventId)
+            if (id != dto.EventId)
                 return NotFound();
+
+            var validator = new UpdateEventValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                }
+
+                ViewData["Venues"] = await _venueRepo.GetAllAsync();
+                return View(dto);
+            }
 
             try
             {
-                await _eventRepo.UpdateAsync(ev);
+                await _editEventHandler.Handle(dto);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
                 ModelState.AddModelError("", "Update failed.");
                 ViewData["Venues"] = await _venueRepo.GetAllAsync();
-                return View(ev);
+                return View(dto);
             }
         }
+
 
         // GET: Events/Delete/5
         public async Task<IActionResult> Delete(int id)
