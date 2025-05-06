@@ -11,12 +11,18 @@ namespace MyMVCApp.Controllers
         private readonly IEventRepository _eventRepo;
         private readonly IVenueRepository _venueRepo;
         private readonly CreateEventHandler _createEventHandler;
+        private readonly GetAllEventsHandler _getAllHandler;
 
-        public EventsController(IEventRepository eventRepo, IVenueRepository venueRepo, CreateEventHandler createEventHandler)
+        public EventsController(
+            IEventRepository eventRepo,
+            IVenueRepository venueRepo,
+            CreateEventHandler createEventHandler,
+            GetAllEventsHandler getAllEventsHandler)
         {
             _eventRepo = eventRepo;
             _venueRepo = venueRepo;
             _createEventHandler = createEventHandler;
+            _getAllHandler = getAllEventsHandler;
         }
 
         // GET: Events with search
