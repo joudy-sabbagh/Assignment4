@@ -1,22 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyMVCApp.Models;
-using System.Threading.Tasks;
+using Core.Interfaces;
+using Application.DTOs;
+using Application.UseCases.Attendees;
+using Application.Validators;
 
 namespace MyMVCApp.Controllers
 {
     public class AttendeesController : Controller
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly IAttendeeRepository _attendeeRepo;
+        private readonly CreateAttendeeHandler _createHandler;
+        private readonly UpdateAttendeeHandler _updateHandler;
+        private readonly DeleteAttendeeHandler _deleteHandler;
+        private readonly GetAllAttendeesHandler _getAllHandler;
 
-        public EventsController(IEventRepository eventRepo)
+        public AttendeesController(
+            IAttendeeRepository attendeeRepo,
+            CreateAttendeeHandler createHandler,
+            UpdateAttendeeHandler updateHandler,
+            DeleteAttendeeHandler deleteHandler,
+            GetAllAttendeesHandler getAllHandler)
         {
-            _eventRepo = eventRepo;
+            _attendeeRepo = attendeeRepo;
+            _createHandler = createHandler;
+            _updateHandler = updateHandler;
+            _deleteHandler = deleteHandler;
+            _getAllHandler = getAllHandler;
         }
 
         // GET: Attendees
-        public async Task<IActionResult> Index() =>
-            View(await _context.Attendees.ToListAsync());
+        public async Task<IActionResult> Index()
+        {
+            var attendees = await _getAllHandler.Handle();
+            return View(attendees);
+        }
 
         // GET: Attendees/Create
         public IActionResult Create() => View();
@@ -24,23 +41,27 @@ namespace MyMVCApp.Controllers
         // POST: Attendees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AttendeeId,Name,Email")] Attendee attendee)
+        public async Task<IActionResult> Create(CreateAttendeeDTO dto)
         {
-            if (ModelState.IsValid)
+            var validator = new CreateAttendeeValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
             {
-                _context.Add(attendee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                return View(dto);
             }
-            return View(attendee);
+
+            await _createHandler.Handle(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Attendees/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-                return NotFound();
-            var attendee = await _context.Attendees.FindAsync(id);
+            var attendee = await _attendeeRepo.GetByIdAsync(id);
             if (attendee == null)
                 return NotFound();
             return View(attendee);
@@ -49,25 +70,30 @@ namespace MyMVCApp.Controllers
         // POST: Attendees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AttendeeId,Name,Email")] Attendee attendee)
+        public async Task<IActionResult> Edit(int id, UpdateAttendeeDTO dto)
         {
-            if (id != attendee.AttendeeId)
+            if (id != dto.AttendeeId)
                 return NotFound();
-            if (ModelState.IsValid)
+
+            var validator = new UpdateAttendeeValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
             {
-                _context.Update(attendee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                return View(dto);
             }
-            return View(attendee);
+
+            await _updateHandler.Handle(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Attendees/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-                return NotFound();
-            var attendee = await _context.Attendees.FirstOrDefaultAsync(a => a.AttendeeId == id);
+            var attendee = await _attendeeRepo.GetByIdAsync(id);
             if (attendee == null)
                 return NotFound();
             return View(attendee);
@@ -78,11 +104,7 @@ namespace MyMVCApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var attendee = await _context.Attendees.FindAsync(id);
-            if (attendee == null)
-                return NotFound();
-            _context.Attendees.Remove(attendee);
-            await _context.SaveChangesAsync();
+            await _deleteHandler.Handle(id);
             return RedirectToAction(nameof(Index));
         }
     }
