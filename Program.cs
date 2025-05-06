@@ -5,8 +5,14 @@ using System.Globalization;
 using Application.Mapping;
 using MediatR;
 using System.Reflection;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog(); 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 // Enforce en-US culture (so decimals use a period)
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
@@ -57,3 +63,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+Log.CloseAndFlush();
