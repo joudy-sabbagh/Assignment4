@@ -10,18 +10,22 @@ namespace MyMVCApp.Controllers
 {
     public class TicketsController : Controller
     {
+        private readonly ITicketRepository _ticketRepo;
         private readonly CreateTicketHandler _createTicketHandler;
+        private readonly UpdateTicketHandler _updateTicketHandler;
 
         public TicketsController(
             ITicketRepository ticketRepo,
             IEventRepository eventRepo,
             IAttendeeRepository attendeeRepo,
-            CreateTicketHandler createTicketHandler)
+            CreateTicketHandler createTicketHandler,
+            UpdateTicketHandler updateTicketHandler)
         {
             _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
             _attendeeRepo = attendeeRepo;
             _createTicketHandler = createTicketHandler;
+            _updateTicketHandler = updateTicketHandler;
         }
 
 
@@ -116,52 +120,32 @@ namespace MyMVCApp.Controllers
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TicketId,EventId,AttendeeId,Category")] Ticket updatedTicket)
+        public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
-            if (id != updatedTicket.TicketId)
+            if (id != dto.TicketId)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            var validator = new UpdateTicketValidator();
+            var result = validator.Validate(dto);
+
+            if (!result.IsValid)
             {
-                try
-                {
-                    var ticket = await _context.Tickets.FindAsync(id);
-                    if (ticket == null)
-                        return NotFound();
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
 
-                    ticket.EventId = updatedTicket.EventId;
-                    ticket.AttendeeId = updatedTicket.AttendeeId;
-                    ticket.Category = updatedTicket.Category;
+                return View(dto);
+            }
 
-                    // Look up the event to update the price.
-                    var ev = await _context.Events.FindAsync(ticket.EventId);
-                    if (ev != null)
-                    {
-                        ticket.Price = ticket.Category switch
-                        {
-                            TicketCategory.Normal    => ev.NormalPrice,
-                            TicketCategory.VIP       => ev.VIPPrice,
-                            TicketCategory.Backstage => ev.BackstagePrice,
-                            _                        => ev.NormalPrice
-                        };
-                    }
-
-                    _context.Update(ticket);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Tickets.Any(e => e.TicketId == updatedTicket.TicketId))
-                        return NotFound();
-                    else
-                        throw;
-                }
+            try
+            {
+                await _updateTicketHandler.Handle(dto);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Events"] = _context.Events.ToList();
-            ViewData["Attendees"] = _context.Attendees.ToList();
-            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
-            return View(updatedTicket);
+            catch
+            {
+                ModelState.AddModelError("", "Update failed.");
+                return View(dto);
+            }
         }
 
         // GET: Tickets/Delete/5
