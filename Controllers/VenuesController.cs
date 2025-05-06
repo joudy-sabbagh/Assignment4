@@ -7,10 +7,11 @@ namespace MyMVCApp.Controllers
 {
     public class VenuesController : Controller
     {
-        private readonly AppDbContext _context;
-        public VenuesController(AppDbContext context)
+        private readonly IEventRepository _eventRepo;
+
+        public EventsController(IEventRepository eventRepo)
         {
-            _context = context;
+            _eventRepo = eventRepo;
         }
 
         // GET: Venues

@@ -10,11 +10,11 @@ namespace MyMVCApp.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IEventRepository _eventRepo;
 
-        public TicketsController(AppDbContext context)
+        public EventsController(IEventRepository eventRepo)
         {
-            _context = context;
+            _eventRepo = eventRepo;
         }
 
         // GET: Tickets with filtering and sorting.

@@ -8,13 +8,13 @@ namespace MyMVCApp.Controllers
 {
     public class EventsController : Controller
     {
-        private readonly AppDbContext _context;
-        
-        public EventsController(AppDbContext context)
+        private readonly IEventRepository _eventRepo;
+
+        public EventsController(IEventRepository eventRepo)
         {
-            _context = context;
+            _eventRepo = eventRepo;
         }
-        
+
         // GET: Events with search functionality
         public async Task<IActionResult> Index(string searchString)
         {
