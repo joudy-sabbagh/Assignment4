@@ -1,7 +1,3 @@
-using Application.DTOs;
-using Core.Entities;
-using Core.Interfaces;
-
 namespace Application.UseCases.Tickets;
 
 public class CreateTicketHandler
@@ -27,6 +23,18 @@ public class CreateTicketHandler
             EventId = dto.EventId,
             AttendeeId = dto.AttendeeId,
             TicketType = dto.TicketType
+        };
+
+        var ev = await _eventRepo.GetByIdAsync(dto.EventId);
+        if (ev == null)
+            throw new Exception("Event not found");
+
+        ticket.Price = ticket.TicketType switch
+        {
+            "Normal" => ev.NormalPrice,
+            "VIP" => ev.VIPPrice,
+            "Backstage" => ev.BackstagePrice,
+            _ => ev.NormalPrice
         };
 
         await _ticketRepo.AddAsync(ticket);

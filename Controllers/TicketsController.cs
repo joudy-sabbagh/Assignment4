@@ -10,12 +10,20 @@ namespace MyMVCApp.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly CreateTicketHandler _createTicketHandler;
 
-        public EventsController(IEventRepository eventRepo)
+        public TicketsController(
+            ITicketRepository ticketRepo,
+            IEventRepository eventRepo,
+            IAttendeeRepository attendeeRepo,
+            CreateTicketHandler createTicketHandler)
         {
+            _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
+            _attendeeRepo = attendeeRepo;
+            _createTicketHandler = createTicketHandler;
         }
+
 
         // GET: Tickets with filtering and sorting.
         public async Task<IActionResult> Index(string sortOrder, int? eventFilter, string categoryFilter)
@@ -71,37 +79,24 @@ namespace MyMVCApp.Controllers
         // POST: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TicketId,EventId,AttendeeId,Category")] Ticket ticket)
+        public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
-            if (ModelState.IsValid)
-            {
-                // Look up the event to get its pricing.
-                var ev = await _context.Events.FindAsync(ticket.EventId);
-                if (ev == null)
-                {
-                    ModelState.AddModelError("EventId", "Invalid Event.");
-                    ViewData["Events"] = _context.Events.ToList();
-                    ViewData["Attendees"] = _context.Attendees.ToList();
-                    ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
-                    return View(ticket);
-                }
-                // Set the ticket price based on the event's pricing for the chosen category.
-                ticket.Price = ticket.Category switch
-                {
-                    TicketCategory.Normal    => ev.NormalPrice,
-                    TicketCategory.VIP       => ev.VIPPrice,
-                    TicketCategory.Backstage => ev.BackstagePrice,
-                    _                        => ev.NormalPrice
-                };
+            var validator = new CreateTicketValidator();
+            var result = validator.Validate(dto);
 
-                _context.Add(ticket);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            if (!result.IsValid)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                ViewData["Events"] = await _eventRepo.GetAllAsync();
+                ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
+                ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+                return View(dto);
             }
-            ViewData["Events"] = _context.Events.ToList();
-            ViewData["Attendees"] = _context.Attendees.ToList();
-            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
-            return View(ticket);
+
+            await _createTicketHandler.Handle(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Tickets/Edit/5
