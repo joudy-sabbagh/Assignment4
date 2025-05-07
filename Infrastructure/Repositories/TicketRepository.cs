@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Infrastructure.Data;
 
 namespace Infrastructure.Repositories
@@ -11,19 +10,29 @@ namespace Infrastructure.Repositories
     public class TicketRepository : ITicketRepository
     {
         private readonly AppDbContext _context;
-        public TicketRepository(AppDbContext context) => _context = context;
 
-        public async Task<IEnumerable<Ticket>> GetAllAsync() =>
-            await _context.Tickets.ToListAsync();
+        public TicketRepository(AppDbContext context)
+        {
+            _context = context;
+        }
 
-        // Expose a queryable for advanced filtering/sorting with joins
-        public IQueryable<Ticket> GetAllWithEventAndAttendee() =>
-            _context.Tickets
-                    .Include(t => t.Event)
-                    .Include(t => t.Attendee);
+        public async Task<IEnumerable<Ticket>> GetAllWithEventAndAttendeeAsync()
+        {
+            return await _context.Tickets
+                                 .Include(t => t.Event)
+                                 .Include(t => t.Attendee)
+                                 .ToListAsync();
+        }
 
-        public async Task<Ticket?> GetByIdAsync(int id) =>
-            await _context.Tickets.FindAsync(id);
+        public async Task<IEnumerable<Ticket>> GetAllAsync()
+        {
+            return await _context.Tickets.ToListAsync();
+        }
+
+        public async Task<Ticket?> GetByIdAsync(int id)
+        {
+            return await _context.Tickets.FindAsync(id);
+        }
 
         public async Task AddAsync(Ticket ticket)
         {

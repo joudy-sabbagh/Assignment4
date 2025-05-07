@@ -1,11 +1,11 @@
-using System.Collections.Generic;      // for List<T>
-using System.Linq;                     // for .ToList()
-using System.Threading;                // for CancellationToken
-using System.Threading.Tasks;          // for Task<T>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.UseCases.Tickets
 {
@@ -20,26 +20,22 @@ namespace Application.UseCases.Tickets
 
         public async Task<List<Ticket>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
         {
-            // 1) Get the base queryable (with includes)
-            var ticketsQuery = _ticketRepo.GetAllWithEventAndAttendee();
+            var tickets = (await _ticketRepo.GetAllWithEventAndAttendeeAsync()).ToList();
 
-            // 2) Filters
             if (request.EventFilter.HasValue)
-                ticketsQuery = ticketsQuery.Where(t => t.EventId == request.EventFilter.Value);
+                tickets = tickets.Where(t => t.EventId == request.EventFilter.Value).ToList();
 
             if (!string.IsNullOrEmpty(request.CategoryFilter) &&
-                Enum.TryParse<TicketCategory>(request.CategoryFilter, out var parsedCategory))
+                Enum.TryParse<TicketCategory>(request.CategoryFilter, out var cat))
             {
-                ticketsQuery = ticketsQuery.Where(t => t.Category == parsedCategory);
+                tickets = tickets.Where(t => t.Category == cat).ToList();
             }
 
-            // 3) Sorting
-            ticketsQuery = request.SortOrder == "price_desc"
-                ? ticketsQuery.OrderByDescending(t => (double)t.Price)
-                : ticketsQuery.OrderBy(t => (double)t.Price);
+            tickets = request.SortOrder == "price_desc"
+                ? tickets.OrderByDescending(t => t.Price).ToList()
+                : tickets.OrderBy(t => t.Price).ToList();
 
-            // 4) Materialize asynchronously to List<Ticket>
-            return await ticketsQuery.ToListAsync();
+            return tickets;
         }
     }
 }

@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Domain.Interfaces
 {
     public interface ITicketRepository
     {
-        IQueryable<Ticket> GetAllWithEventAndAttendee();
+        Task<IEnumerable<Ticket>> GetAllWithEventAndAttendeeAsync();
         Task<IEnumerable<Ticket>> GetAllAsync();
         Task<Ticket?> GetByIdAsync(int id);
         Task AddAsync(Ticket ticket);
