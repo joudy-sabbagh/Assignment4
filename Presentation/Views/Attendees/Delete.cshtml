@@ -5,6 +5,7 @@
 <p><strong>Email:</strong> @Model.Email</p>
 
 <form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="AttendeeId" />
     <button type="submit" class="btn btn-danger">Delete</button>
 </form>
