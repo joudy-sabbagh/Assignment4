@@ -1,32 +1,32 @@
 // Application/UseCases/Venues/CreateVenueHandler.cs
-using System.Threading;
-using System.Threading.Tasks;
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Venues
 {
     public class CreateVenueHandler : IRequestHandler<CreateVenueCommand, int>
     {
         private readonly IVenueRepository _venueRepo;
+        private readonly ILogger<CreateVenueHandler> _logger;
 
-        public CreateVenueHandler(IVenueRepository venueRepo) =>
+        public CreateVenueHandler(IVenueRepository venueRepo, ILogger<CreateVenueHandler> logger)
+        {
             _venueRepo = venueRepo;
+            _logger = logger;
+        }
 
         public async Task<int> Handle(CreateVenueCommand request, CancellationToken cancellationToken)
         {
-            var dto = request.Dto;
+            _logger.LogInformation("Creating venue {@Dto}", request.Dto);
 
-            // Use domain constructor (with guard clauses)
-            var venue = new Venue(
-                dto.Name,
-                dto.Capacity,
-                dto.Location
-            );
+            var dto = request.Dto;
+            var venue = new Venue(dto.Name, dto.Capacity, dto.Location);
 
             await _venueRepo.AddAsync(venue);
+            _logger.LogInformation("Created Venue with Id {VenueId}", venue.Id);
             return venue.Id;
         }
     }

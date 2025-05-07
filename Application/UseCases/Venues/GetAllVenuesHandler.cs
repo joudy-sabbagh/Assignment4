@@ -6,6 +6,7 @@ using AutoMapper;
 using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Venues
 {
@@ -14,21 +15,27 @@ namespace Application.UseCases.Venues
     {
         private readonly IVenueRepository _repo;
         private readonly IMapper _mapper;
+        private readonly ILogger<GetAllVenuesHandler> _logger;
 
         public GetAllVenuesHandler(
             IVenueRepository repo,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<GetAllVenuesHandler> logger)
         {
             _repo = repo;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<List<VenueListDTO>> Handle(
-            GetAllVenuesQuery request,
-            CancellationToken cancellationToken)
+        public async Task<List<VenueListDTO>> Handle(GetAllVenuesQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Handling GetAllVenuesQuery");
+
             var entities = await _repo.GetAllAsync();
-            return _mapper.Map<List<VenueListDTO>>(entities);
+            var dtos = _mapper.Map<List<VenueListDTO>>(entities);
+
+            _logger.LogInformation("Retrieved {Count} venues", dtos.Count);
+            return dtos;
         }
     }
 }
