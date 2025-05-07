@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using Application.Mapping;
 using Domain.Interfaces;
-using Infrastructure.Data;
+using Persistence.Data;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Localization;
@@ -34,7 +34,10 @@ builder.Services.AddMediatR(cfg =>
 
 // 6) EF Core / SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(
+      configuration.GetConnectionString("DefaultConnection"),
+      b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
+    ));
 
 // 7) DI for your Repositories
 builder.Services.AddScoped<IEventRepository, EventRepository>();
