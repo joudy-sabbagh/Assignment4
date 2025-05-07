@@ -1,7 +1,10 @@
+// Application/UseCases/Events/CreateEventHandler.cs
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.UseCases.Events
 {
@@ -17,18 +20,21 @@ namespace Application.UseCases.Events
         public async Task<int> Handle(CreateEventCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
-            var newEvent = new Event
-            {
-                Name = dto.Name,
-                EventDate = dto.EventDate,    
-                NormalPrice = dto.NormalPrice,
-                VIPPrice = dto.VIPPrice,     
-                BackstagePrice = dto.BackstagePrice,
-                VenueId = dto.VenueId
-            };
+
+            // Instantiate via your domain constructor (with guard clauses)
+            var newEvent = new Event(
+                dto.Name,
+                dto.EventDate,
+                dto.NormalPrice,
+                dto.VIPPrice,
+                dto.BackstagePrice,
+                dto.VenueId
+            );
 
             await _eventRepo.AddAsync(newEvent);
-            return newEvent.EventId;
+
+            // Return the new single Id
+            return newEvent.Id;
         }
     }
 }

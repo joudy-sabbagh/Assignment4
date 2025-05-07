@@ -1,3 +1,6 @@
+// Application/UseCases/Venues/CreateVenueHandler.cs
+using System.Threading;
+using System.Threading.Tasks;
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -9,19 +12,19 @@ namespace Application.UseCases.Venues
     {
         private readonly IVenueRepository _venueRepo;
 
-        public CreateVenueHandler(IVenueRepository venueRepo)
-        {
+        public CreateVenueHandler(IVenueRepository venueRepo) =>
             _venueRepo = venueRepo;
-        }
 
         public async Task<int> Handle(CreateVenueCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
-            var venue = new Venue
-            {
-                Name = dto.Name,
-                Capacity = dto.Capacity
-            };
+
+            // Use domain constructor (with guard clauses)
+            var venue = new Venue(
+                dto.Name,
+                dto.Capacity,
+                dto.Location
+            );
 
             await _venueRepo.AddAsync(venue);
             return venue.Id;

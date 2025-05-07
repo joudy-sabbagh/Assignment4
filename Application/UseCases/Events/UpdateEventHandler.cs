@@ -1,3 +1,7 @@
+// Application/UseCases/Events/UpdateEventHandler.cs
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
@@ -6,27 +10,27 @@ namespace Application.UseCases.Events
 {
     public class UpdateEventHandler : IRequestHandler<UpdateEventCommand>
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly IEventRepository _repo;
 
-        public UpdateEventHandler(IEventRepository eventRepo)
-        {
-            _eventRepo = eventRepo;
-        }
+        public UpdateEventHandler(IEventRepository repo) => _repo = repo;
 
         public async Task Handle(UpdateEventCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
-            var ev = await _eventRepo.GetByIdAsync(dto.EventId);
-            if (ev == null) throw new Exception("Event not found");
+            var ev = await _repo.GetByIdAsync(dto.Id);
+            if (ev == null)
+                throw new KeyNotFoundException($"Event with ID {dto.Id} not found.");
 
-            ev.Name = dto.Name;
-            ev.EventDate = dto.EventDate;   
-            ev.NormalPrice = dto.NormalPrice;
-            ev.VIPPrice = dto.VIPPrice;   
-            ev.BackstagePrice = dto.BackstagePrice;
-            ev.VenueId = dto.VenueId;
-
-            await _eventRepo.UpdateAsync(ev);
+            // use domain UpdateDetails method
+            ev.UpdateDetails(
+                dto.Name,
+                dto.EventDate,
+                dto.NormalPrice,
+                dto.VIPPrice,
+                dto.BackstagePrice,
+                dto.VenueId
+            );
+            await _repo.UpdateAsync(ev);
         }
     }
 }

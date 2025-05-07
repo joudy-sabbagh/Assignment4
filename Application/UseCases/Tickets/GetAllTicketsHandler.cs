@@ -1,41 +1,45 @@
-using System;
+// Application/UseCases/Tickets/GetAllTicketsHandler.cs
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities;
+using AutoMapper;
+using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
 
 namespace Application.UseCases.Tickets
 {
-    public class GetAllTicketsHandler : IRequestHandler<GetAllTicketsQuery, List<Ticket>>
+    public class GetAllTicketsHandler
+        : IRequestHandler<GetAllTicketsQuery, List<TicketListDTO>>
     {
         private readonly ITicketRepository _ticketRepo;
+        private readonly IMapper _mapper;
 
-        public GetAllTicketsHandler(ITicketRepository ticketRepo)
+        public GetAllTicketsHandler(
+            ITicketRepository ticketRepo,
+            IMapper mapper)
         {
             _ticketRepo = ticketRepo;
+            _mapper = mapper;
         }
 
-        public async Task<List<Ticket>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
+        public async Task<List<TicketListDTO>> Handle(
+            GetAllTicketsQuery request,
+            CancellationToken cancellationToken)
         {
-            var tickets = (await _ticketRepo.GetAllWithEventAndAttendeeAsync()).ToList();
+            var entities = await _ticketRepo.GetAllAsync();
 
+            // apply filters and sort in memory
+            var q = entities.AsQueryable();
             if (request.EventFilter.HasValue)
-                tickets = tickets.Where(t => t.EventId == request.EventFilter.Value).ToList();
+                q = q.Where(t => t.EventId == request.EventFilter.Value);
+            if (!string.IsNullOrEmpty(request.CategoryFilter))
+                q = q.Where(t => t.Category.ToString() == request.CategoryFilter);
+            q = request.SortOrder == "price_desc"
+                ? q.OrderByDescending(t => t.Price)
+                : q.OrderBy(t => t.Price);
 
-            if (!string.IsNullOrEmpty(request.CategoryFilter) &&
-                Enum.TryParse<TicketCategory>(request.CategoryFilter, out var cat))
-            {
-                tickets = tickets.Where(t => t.Category == cat).ToList();
-            }
-
-            tickets = request.SortOrder == "price_desc"
-                ? tickets.OrderByDescending(t => t.Price).ToList()
-                : tickets.OrderBy(t => t.Price).ToList();
-
-            return tickets;
+            return _mapper.Map<List<TicketListDTO>>(q.ToList());
         }
     }
 }

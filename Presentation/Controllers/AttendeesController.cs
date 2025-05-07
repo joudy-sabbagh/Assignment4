@@ -1,8 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+// Presentation/Controllers/AttendeesController.cs
+using System.Linq;
+using System.Threading.Tasks;
 using Application.DTOs;
 using Application.UseCases.Attendees;
 using Application.Validators;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
@@ -10,37 +13,29 @@ namespace Presentation.Controllers
     {
         private readonly IMediator _mediator;
 
-        public AttendeesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public AttendeesController(IMediator mediator) => _mediator = mediator;
 
         // GET: Attendees
         public async Task<IActionResult> Index()
         {
-            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
-            return View(attendees);
+            var model = await _mediator.Send(new GetAllAttendeesQuery());
+            return View(model);
         }
 
         // GET: Attendees/Create
         public IActionResult Create() => View();
 
         // POST: Attendees/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateAttendeeDTO dto)
         {
-            var validator = new CreateAttendeeValidator();
-            var result = validator.Validate(dto);
-
+            var result = new CreateAttendeeValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
-
             await _mediator.Send(new CreateAttendeeCommand(dto));
             return RedirectToAction(nameof(Index));
         }
@@ -48,38 +43,29 @@ namespace Presentation.Controllers
         // GET: Attendees/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
-            var attendee = attendees.FirstOrDefault(a => a.Id == id);
+            var list = await _mediator.Send(new GetAllAttendeesQuery());
+            var item = list.FirstOrDefault(a => a.Id == id);
+            if (item == null) return NotFound();
 
-            if (attendee == null)
-                return NotFound();
-
-            var dto = new UpdateAttendeeDTO
+            return View(new UpdateAttendeeDTO
             {
-                AttendeeId = attendee.Id,
-                Name = attendee.Name,
-                Email = attendee.Email
-            };
-
-            return View(dto);
+                Id = item.Id,
+                Name = item.Name,
+                Email = item.Email
+            });
         }
 
         // POST: Attendees/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateAttendeeDTO dto)
         {
-            if (id != dto.AttendeeId)
-                return NotFound();
+            if (id != dto.Id) return NotFound();
 
-            var validator = new UpdateAttendeeValidator();
-            var result = validator.Validate(dto);
-
+            var result = new UpdateAttendeeValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
 
@@ -90,18 +76,14 @@ namespace Presentation.Controllers
         // GET: Attendees/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var attendees = await _mediator.Send(new GetAllAttendeesQuery());
-            var attendee = attendees.FirstOrDefault(a => a.Id == id);
-
-            if (attendee == null)
-                return NotFound();
-
-            return View(attendee);
+            var list = await _mediator.Send(new GetAllAttendeesQuery());
+            var item = list.FirstOrDefault(a => a.Id == id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
         // POST: Attendees/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _mediator.Send(new DeleteAttendeeCommand(id));

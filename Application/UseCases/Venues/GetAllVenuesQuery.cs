@@ -1,8 +1,9 @@
-using Domain.Entities;
-using MediatR;
+// Application/UseCases/Venues/GetAllVenuesQuery.cs
 using System.Collections.Generic;
+using Application.DTOs;
+using MediatR;
 
 namespace Application.UseCases.Venues
 {
-    public class GetAllVenuesQuery : IRequest<List<Venue>> { }
+    public class GetAllVenuesQuery : IRequest<List<VenueListDTO>> { }
 }

@@ -9,7 +9,7 @@ public class UpdateTicketValidator : AbstractValidator<UpdateTicketDTO>
 {
     public UpdateTicketValidator()
     {
-        RuleFor(t => t.TicketId).GreaterThanOrEqualTo(0).WithMessage("Ticket ID must be positive");
+        RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(t => t.EventId).GreaterThanOrEqualTo(0).WithMessage("Event ID must be valid");
         RuleFor(t => t.AttendeeId).GreaterThanOrEqualTo(0).WithMessage("Attendee ID must be valid");
         RuleFor(t => t.TicketType)

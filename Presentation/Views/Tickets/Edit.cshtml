@@ -1,30 +1,23 @@
+@* Views/Tickets/Edit.cshtml *@
 @model Application.DTOs.UpdateTicketDTO
 @using Domain.Entities
-@using System.Collections.Generic
-@using System.Linq
-
 @{
     ViewData["Title"] = "Edit Ticket";
-    var events       = ViewData["Events"]    as List<Event>             ?? new List<Event>();
-    var attendees    = ViewData["Attendees"] as List<Attendee>         ?? new List<Attendee>();
-    var categoryList = ViewData["CategoryList"] as IEnumerable<TicketCategory>
+    var events       = ViewData["Events"]    as IEnumerable<Event>          ?? Enumerable.Empty<Event>();
+    var attendees    = ViewData["Attendees"] as IEnumerable<Attendee>       ?? Enumerable.Empty<Attendee>();
+    var categories   = ViewData["CategoryList"] as IEnumerable<TicketCategory>
                           ?? Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
 }
 
-<h2>Edit Ticket</h2>
-
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+<h1>Edit Ticket</h1>
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="TicketId" />
+    <input type="hidden" asp-for="Id" />
 
-    <!-- Ticket Type -->
     <div class="form-group">
         <label asp-for="TicketType"></label>
         <select asp-for="TicketType" class="form-control">
-            @foreach (var cat in categoryList)
-            {
-            <option value="@cat" selected="@(cat.ToString() == Model.TicketType)">
+            @foreach(var cat in categories) {
+            <option value="@cat" selected="@(cat.ToString()==Model.TicketType)">
                 @cat
             </option>
             }
@@ -32,13 +25,11 @@
         <span asp-validation-for="TicketType" class="text-danger"></span>
     </div>
 
-    <!-- Event Selection -->
     <div class="form-group">
-        <label asp-for="EventId">Event</label>
+        <label asp-for="EventId"></label>
         <select asp-for="EventId" class="form-control">
-            @foreach (var ev in events)
-            {
-            <option value="@ev.EventId" selected="@(ev.EventId == Model.EventId)">
+            @foreach(var ev in events) {
+            <option value="@ev.Id" selected="@(ev.Id==Model.EventId)">
                 @ev.Name
             </option>
             }
@@ -46,27 +37,19 @@
         <span asp-validation-for="EventId" class="text-danger"></span>
     </div>
 
-    <!-- Attendee Selection -->
     <div class="form-group">
-        <label asp-for="AttendeeId">Attendee</label>
+        <label asp-for="AttendeeId"></label>
         <select asp-for="AttendeeId" class="form-control">
-            @foreach (var att in attendees)
-            {
-            <option value="@att.AttendeeId" selected="@(att.AttendeeId == Model.AttendeeId)">
-                @att.Name
+            @foreach(var a in attendees) {
+            <option value="@a.Id" selected="@(a.Id==Model.AttendeeId)">
+                @a.Name
             </option>
             }
         </select>
         <span asp-validation-for="AttendeeId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-warning">Update</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

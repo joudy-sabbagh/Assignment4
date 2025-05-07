@@ -23,9 +23,6 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AttendeeId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -41,7 +38,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
                 {
-                    b.Property<int>("EventId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -64,7 +61,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("VenueId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("EventId");
+                    b.HasKey("Id");
 
                     b.HasIndex("VenueId");
 
@@ -88,9 +85,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TicketType")
                         .IsRequired()
@@ -121,9 +115,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("VenueId")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

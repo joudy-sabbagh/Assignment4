@@ -1,29 +1,29 @@
-@model IEnumerable<Domain.Entities.Attendee>
+@model IEnumerable<Application.DTOs.AttendeeListDTO>
 
     @{
     ViewData["Title"] = "Attendees";
     }
 
-    <h2>Attendees</h2>
-    <a class="btn btn-primary" asp-action="Create">Add New Attendee</a>
+    <h1>Attendees</h1>
+    <p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Actions</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var attendee in Model)
+            @foreach (var a in Model)
     {
             <tr>
-                <td>@attendee.Name</td>
-                <td>@attendee.Email</td>
+                <td>@a.Name</td>
+                <td>@a.Email</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@attendee.AttendeeId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@attendee.AttendeeId">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@a.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@a.Id">Delete</a>
                 </td>
             </tr>
     }

@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Application.UseCases.Attendees;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,9 +32,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // 5) MediatR
 builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(GetAllTicketsHandler).Assembly);
-});
+    cfg.RegisterServicesFromAssembly(typeof(CreateAttendeeHandler).Assembly)
+);
 
 // 6) EF Core / SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>

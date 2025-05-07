@@ -1,9 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
+// Presentation/Controllers/EventsController.cs
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Application.DTOs;
-using Application.Validators;
 using Application.UseCases.Events;
+using Application.Validators;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
@@ -18,17 +22,15 @@ namespace Presentation.Controllers
             _venueRepo = venueRepo;
         }
 
-        // GET: Events with search
+        // GET: Events
         public async Task<IActionResult> Index(string searchString)
         {
-            var events = await _mediator.Send(new GetAllEventsQuery());
-
+            var list = await _mediator.Send(new GetAllEventsQuery());
             if (!string.IsNullOrEmpty(searchString))
-            {
-                events = events.Where(e => e.Name.ToLower().Contains(searchString.ToLower())).ToList();
-            }
-
-            return View(events);
+                list = list
+                    .Where(e => e.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            return View(list);
         }
 
         // GET: Events/Create
@@ -39,24 +41,17 @@ namespace Presentation.Controllers
         }
 
         // POST: Events/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateEventDTO dto)
         {
-            var validator = new CreateEventValidator();
-            var result = validator.Validate(dto);
-
+            var result = new CreateEventValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-                }
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 ViewData["Venues"] = await _venueRepo.GetAllAsync();
                 return View(dto);
             }
-
             await _mediator.Send(new CreateEventCommand(dto));
             return RedirectToAction(nameof(Index));
         }
@@ -64,76 +59,53 @@ namespace Presentation.Controllers
         // GET: Events/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var allEvents = await _mediator.Send(new GetAllEventsQuery());
-            var ev = allEvents.FirstOrDefault(e => e.EventId == id);
-
-            if (ev == null)
-                return NotFound();
-
-            var dto = new UpdateEventDTO
-            {
-                EventId = ev.EventId,
-                Name = ev.Name,
-                EventDate = ev.EventDate,  
-                NormalPrice = ev.NormalPrice,
-                VIPPrice = ev.VIPPrice,    
-                BackstagePrice = ev.BackstagePrice,
-                VenueId = ev.VenueId
-            };
-
+            var list = await _mediator.Send(new GetAllEventsQuery());
+            var item = list.FirstOrDefault(e => e.Id == id);
+            if (item == null) return NotFound();
 
             ViewData["Venues"] = await _venueRepo.GetAllAsync();
-            return View(dto);
+            return View(new UpdateEventDTO
+            {
+                Id = item.Id,
+                Name = item.Name,
+                EventDate = item.EventDate,
+                NormalPrice = item.NormalPrice,
+                VIPPrice = item.VIPPrice,
+                BackstagePrice = item.BackstagePrice,
+                VenueId = item.VenueId
+            });
         }
 
         // POST: Events/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateEventDTO dto)
         {
-            if (id != dto.EventId)
-                return NotFound();
+            if (id != dto.Id) return NotFound();
 
-            var validator = new UpdateEventValidator();
-            var result = validator.Validate(dto);
-
+            var result = new UpdateEventValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 ViewData["Venues"] = await _venueRepo.GetAllAsync();
                 return View(dto);
             }
 
-            try
-            {
-                await _mediator.Send(new UpdateEventCommand(dto));
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                ModelState.AddModelError("", "Update failed.");
-                ViewData["Venues"] = await _venueRepo.GetAllAsync();
-                return View(dto);
-            }
+            await _mediator.Send(new UpdateEventCommand(dto));
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Events/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var allEvents = await _mediator.Send(new GetAllEventsQuery());
-            var ev = allEvents.FirstOrDefault(e => e.EventId == id);
-
-            if (ev == null)
-                return NotFound();
-
-            return View(ev);
+            var list = await _mediator.Send(new GetAllEventsQuery());
+            var item = list.FirstOrDefault(e => e.Id == id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
         // POST: Events/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _mediator.Send(new DeleteEventCommand(id));

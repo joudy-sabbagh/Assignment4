@@ -1,26 +1,34 @@
-using System.Collections.Generic;      // for List<T>
-using System.Linq;                     // for .ToList()
-using System.Threading;                // for CancellationToken
-using System.Threading.Tasks;          // for Task<T>
-using Domain.Entities;
+// Application/UseCases/Events/GetAllEventsHandler.cs
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
 
 namespace Application.UseCases.Events
 {
-    public class GetAllEventsHandler : IRequestHandler<GetAllEventsQuery, List<Event>>
+    public class GetAllEventsHandler
+        : IRequestHandler<GetAllEventsQuery, List<EventListDTO>>
     {
-        private readonly IEventRepository _eventRepo;
+        private readonly IEventRepository _repo;
+        private readonly IMapper _mapper;
 
-        public GetAllEventsHandler(IEventRepository eventRepo)
+        public GetAllEventsHandler(
+            IEventRepository repo,
+            IMapper mapper)
         {
-            _eventRepo = eventRepo;
+            _repo = repo;
+            _mapper = mapper;
         }
 
-        public async Task<List<Event>> Handle(GetAllEventsQuery request, CancellationToken cancellationToken)
+        public async Task<List<EventListDTO>> Handle(
+            GetAllEventsQuery request,
+            CancellationToken cancellationToken)
         {
-            return (await _eventRepo.GetAllAsync()).ToList();
-
+            var entities = await _repo.GetAllAsync();
+            return _mapper.Map<List<EventListDTO>>(entities);
         }
     }
 }

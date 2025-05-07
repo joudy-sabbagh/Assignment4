@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+// Presentation/Controllers/TicketsController.cs
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Application.DTOs;
-using Application.Validators;
 using Application.UseCases.Tickets;
+using Application.Validators;
+using Domain.Entities;             // for TicketCategory
 using Domain.Interfaces;
-using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
@@ -14,22 +18,30 @@ namespace Presentation.Controllers
         private readonly IEventRepository _eventRepo;
         private readonly IAttendeeRepository _attendeeRepo;
 
-        public TicketsController(IMediator mediator, IEventRepository eventRepo, IAttendeeRepository attendeeRepo)
+        public TicketsController(
+            IMediator mediator,
+            IEventRepository eventRepo,
+            IAttendeeRepository attendeeRepo)
         {
             _mediator = mediator;
             _eventRepo = eventRepo;
             _attendeeRepo = attendeeRepo;
         }
 
-        // GET: Tickets with filtering and sorting
-        public async Task<IActionResult> Index(string sortOrder, int? eventFilter, string categoryFilter)
+        // GET: Tickets
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            int? eventFilter,
+            string categoryFilter)
         {
-            ViewData["PriceSortParam"] = sortOrder == "price_asc" ? "price_desc" : "price_asc";
             ViewData["Events"] = await _eventRepo.GetAllAsync();
-            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
+                                        .Cast<TicketCategory>();
 
-            var tickets = await _mediator.Send(new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter));
-            return View(tickets);
+            var list = await _mediator.Send(
+                new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
+            );
+            return View(list);
         }
 
         // GET: Tickets/Create
@@ -37,116 +49,93 @@ namespace Presentation.Controllers
         {
             ViewData["Events"] = await _eventRepo.GetAllAsync();
             ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
-            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
+                                        .Cast<TicketCategory>();
             return View();
         }
 
         // POST: Tickets/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
-            var validator = new CreateTicketValidator();
-            var result = validator.Validate(dto);
-
+            var result = new CreateTicketValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
 
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
-                ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+                ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
+                                            .Cast<TicketCategory>();
                 return View(dto);
             }
-
             await _mediator.Send(new CreateTicketCommand(dto));
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Tickets/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
-
-            var ticket = await _mediator.Send(new GetAllTicketsQuery("", null, null));
-            var existing = ticket.FirstOrDefault(t => t.TicketId == id);
-            if (existing == null) return NotFound();
-
-            var dto = new UpdateTicketDTO
-            {
-                TicketId = existing.TicketId,
-                EventId = existing.EventId,
-                AttendeeId = existing.AttendeeId,
-                TicketType = existing.TicketType
-            };
+            var list = await _mediator.Send(
+                new GetAllTicketsQuery("", null, null)
+            );
+            var item = list.FirstOrDefault(t => t.Id == id);
+            if (item == null) return NotFound();
 
             ViewData["Events"] = await _eventRepo.GetAllAsync();
             ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
-            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
-            return View(dto);
+            ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
+                                        .Cast<TicketCategory>();
+
+            return View(new UpdateTicketDTO
+            {
+                Id = item.Id,
+                EventId = item.EventId,
+                AttendeeId = item.AttendeeId,
+                TicketType = item.Category
+            });
         }
 
         // POST: Tickets/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
-            if (id != dto.TicketId) return NotFound();
+            if (id != dto.Id) return NotFound();
 
-            var validator = new UpdateTicketValidator();
-            var result = validator.Validate(dto);
-
+            var result = new UpdateTicketValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
 
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
-                ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+                ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
+                                            .Cast<TicketCategory>();
                 return View(dto);
             }
-
-            try
-            {
-                await _mediator.Send(new UpdateTicketCommand(dto));
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                ModelState.AddModelError("", "Update failed.");
-                return View(dto);
-            }
+            await _mediator.Send(new UpdateTicketCommand(dto));
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Tickets/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
-
-            var ticketList = await _mediator.Send(new GetAllTicketsQuery("", null, null));
-            var ticket = ticketList.FirstOrDefault(t => t.TicketId == id);
-
-            if (ticket == null) return NotFound();
-            return View(ticket);
+            var list = await _mediator.Send(
+                new GetAllTicketsQuery("", null, null)
+            );
+            var item = list.FirstOrDefault(t => t.Id == id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
         // POST: Tickets/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            try
-            {
-                await _mediator.Send(new DeleteTicketCommand(id));
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                ModelState.AddModelError("", "Delete failed.");
-                return RedirectToAction(nameof(Index));
-            }
+            await _mediator.Send(new DeleteTicketCommand(id));
+            return RedirectToAction(nameof(Index));
         }
     }
 }

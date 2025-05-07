@@ -33,7 +33,7 @@
         <select asp-for="EventId" class="form-control">
             @foreach (var ev in events)
             {
-            <option value="@ev.EventId">@ev.Name</option>
+            <option value="@ev.Id">@ev.Name</option>
             }
         </select>
         <span asp-validation-for="EventId" class="text-danger"></span>
@@ -45,7 +45,7 @@
         <select asp-for="AttendeeId" class="form-control">
             @foreach (var att in attendees)
             {
-            <option value="@att.AttendeeId">@att.Name</option>
+            <option value="@att.Id">@att.Name</option>
             }
         </select>
         <span asp-validation-for="AttendeeId" class="text-danger"></span>

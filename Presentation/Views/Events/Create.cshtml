@@ -1,13 +1,13 @@
+@* Views/Events/Create.cshtml *@
 @model Application.DTOs.CreateEventDTO
-@using Domain.Entities
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
     ViewData["Title"] = "Create Event";
+    var venues = ViewData["Venues"] as IEnumerable<Domain.Entities.Venue>;
 }
 
-<h2>Create Event</h2>
-
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<h1>Create Event</h1>
 
 <form asp-action="Create" method="post">
     <div class="form-group">
@@ -15,40 +15,33 @@
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="EventDate"></label>
         <input asp-for="EventDate" type="date" class="form-control" />
         <span asp-validation-for="EventDate" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="NormalPrice"></label>
-        <input asp-for="NormalPrice" type="number" class="form-control" step="any" />
+        <input asp-for="NormalPrice" class="form-control" />
         <span asp-validation-for="NormalPrice" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="VIPPrice"></label>
-        <input asp-for="VIPPrice" type="number" class="form-control" step="any" />
+        <input asp-for="VIPPrice" class="form-control" />
         <span asp-validation-for="VIPPrice" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="BackstagePrice"></label>
-        <input asp-for="BackstagePrice" type="number" class="form-control" step="any" />
+        <input asp-for="BackstagePrice" class="form-control" />
         <span asp-validation-for="BackstagePrice" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="VenueId"></label>
-        <select asp-for="VenueId" class="form-control"
-                asp-items="@(new SelectList(ViewData["Venues"] as IEnumerable<Venue>, "VenueId", "Name"))">
-        </select>
+        <select asp-for="VenueId"
+                asp-items="@(new SelectList(venues, "Id", "Name"))"
+                class="form-control"></select>
         <span asp-validation-for="VenueId" class="text-danger"></span>
     </div>
-
-    <button type="submit" class="btn btn-success">Create</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
-
-<partial name="_ValidationScriptsPartial" />

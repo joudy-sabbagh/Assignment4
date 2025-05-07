@@ -17,8 +17,8 @@ namespace Infrastructure.Repositories
 
         public async Task<Event?> GetByIdAsync(int id) =>
             await _context.Events
-                          .Include(e => e.Venue)
-                          .FirstOrDefaultAsync(e => e.EventId == id);
+                .Include(e => e.Venue)                   
+                .FirstOrDefaultAsync(e => e.Id == id);   
 
         public async Task AddAsync(Event ev)
         {

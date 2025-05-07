@@ -1,23 +1,68 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+// Domain/Entities/Ticket.cs
+using System;
 
 namespace Domain.Entities
 {
     public class Ticket
     {
-        public int TicketId { get; set; }
-        public int Id { get => TicketId; set => TicketId = value; }
-        public string TicketType { get; set; } = string.Empty;
+        public int Id { get; private set; }
+        public string TicketType { get; private set; }
+        public decimal Price { get; private set; }
+        public TicketCategory Category { get; private set; }
+        public int EventId { get; private set; }
+        public Event Event { get; private set; } = null!;
+        public int AttendeeId { get; private set; }
+        public Attendee Attendee { get; private set; } = null!;
 
-        // The price will be set automatically based on the Event's pricing.
-        public decimal Price { get; set; }
+        // EF Core
+        private Ticket() { }
 
-        public TicketCategory Category { get; set; }
+        // Creation with guards
+        public Ticket(
+            string ticketType,
+            decimal price,
+            TicketCategory category,
+            int eventId,
+            int attendeeId)
+        {
+            if (string.IsNullOrWhiteSpace(ticketType))
+                throw new ArgumentException("Ticket type is required.", nameof(ticketType));
+            if (price < 0)
+                throw new ArgumentException("Price must be non negative.", nameof(price));
+            if (eventId <= 0)
+                throw new ArgumentException("EventId must be provided.", nameof(eventId));
+            if (attendeeId <= 0)
+                throw new ArgumentException("AttendeeId must be provided.", nameof(attendeeId));
 
-        public int EventId { get; set; }
-        public Event? Event { get; set; }
+            TicketType = ticketType;
+            Price = price;
+            Category = category;
+            EventId = eventId;
+            AttendeeId = attendeeId;
+        }
 
-        public int AttendeeId { get; set; }
-        public Attendee? Attendee { get; set; }
+        // Mutation helper for updates
+        public void UpdateTypeAndPrice(
+            string ticketType,
+            decimal price,
+            TicketCategory category,
+            int eventId,
+            int attendeeId)
+        {
+            if (string.IsNullOrWhiteSpace(ticketType))
+                throw new ArgumentException("Ticket type is required.", nameof(ticketType));
+            if (price < 0)
+                throw new ArgumentException("Price must be non negative.", nameof(price));
+            if (eventId <= 0)
+                throw new ArgumentException("EventId must be provided.", nameof(eventId));
+            if (attendeeId <= 0)
+                throw new ArgumentException("AttendeeId must be provided.", nameof(attendeeId));
+
+            TicketType = ticketType;
+            Price = price;
+            Category = category;
+            EventId = eventId;
+            AttendeeId = attendeeId;
+        }
     }
 }

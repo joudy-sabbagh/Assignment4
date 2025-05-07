@@ -1,3 +1,4 @@
+// Application/Mapping/MappingProfile.cs
 using AutoMapper;
 using Domain.Entities;
 using Application.DTOs;
@@ -8,21 +9,39 @@ namespace Application.Mapping
     {
         public MappingProfile()
         {
-            // Attendee mappings
+            // Command-side mappings
             CreateMap<CreateAttendeeDTO, Attendee>();
-            CreateMap<UpdateAttendeeDTO, Attendee>();
+            CreateMap<UpdateAttendeeDTO, Attendee>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-            // Event mappings
             CreateMap<CreateEventDTO, Event>();
-            CreateMap<UpdateEventDTO, Event>();
+            CreateMap<UpdateEventDTO, Event>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-            // Ticket mappings
             CreateMap<CreateTicketDTO, Ticket>();
-            CreateMap<UpdateTicketDTO, Ticket>();
+            CreateMap<UpdateTicketDTO, Ticket>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-            // Venue mappings
             CreateMap<CreateVenueDTO, Venue>();
-            CreateMap<UpdateVenueDTO, Venue>();
+            CreateMap<UpdateVenueDTO, Venue>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+
+            // Read-side (list) mappings
+            CreateMap<Attendee, AttendeeListDTO>();
+
+            CreateMap<Venue, VenueListDTO>();
+
+            CreateMap<Event, EventListDTO>()
+                .ForMember(dest => dest.VenueId,
+                           opt => opt.MapFrom(src => src.VenueId));
+
+            CreateMap<Ticket, TicketListDTO>()
+                .ForMember(dest => dest.Category,
+                           opt => opt.MapFrom(src => src.Category.ToString()))
+                .ForMember(dest => dest.EventId,
+                           opt => opt.MapFrom(src => src.EventId))
+                .ForMember(dest => dest.AttendeeId,
+                           opt => opt.MapFrom(src => src.AttendeeId));
         }
     }
 }

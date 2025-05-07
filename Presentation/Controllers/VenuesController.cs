@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+// Presentation/Controllers/VenuesController.cs
+using System.Linq;
+using System.Threading.Tasks;
 using Application.DTOs;
-using Application.Validators;
 using Application.UseCases.Venues;
-using Domain.Interfaces;
+using Application.Validators;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
@@ -11,105 +13,77 @@ namespace Presentation.Controllers
     {
         private readonly IMediator _mediator;
 
-        public VenuesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public VenuesController(IMediator mediator) => _mediator = mediator;
 
         // GET: Venues
         public async Task<IActionResult> Index()
         {
-            var venues = await _mediator.Send(new GetAllVenuesQuery());
-            return View(venues);
+            var list = await _mediator.Send(new GetAllVenuesQuery());
+            return View(list);
         }
 
         // GET: Venues/Create
         public IActionResult Create() => View();
 
         // POST: Venues/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateVenueDTO dto)
         {
-            var validator = new CreateVenueValidator();
-            var result = validator.Validate(dto);
-
+            var result = new CreateVenueValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
-
             await _mediator.Send(new CreateVenueCommand(dto));
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Venues/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
+            var list = await _mediator.Send(new GetAllVenuesQuery());
+            var item = list.FirstOrDefault(v => v.Id == id);
+            if (item == null) return NotFound();
 
-            var venues = await _mediator.Send(new GetAllVenuesQuery());
-            var venue = venues.FirstOrDefault(v => v.VenueId == id);
-            if (venue == null) return NotFound();
-
-            var dto = new UpdateVenueDTO
+            return View(new UpdateVenueDTO
             {
-                VenueId = venue.VenueId,
-                Name = venue.Name,
-                Capacity = venue.Capacity
-            };
-
-            return View(dto);
+                Id = item.Id,
+                Name = item.Name,
+                Location = item.Location,
+                Capacity = item.Capacity
+            });
         }
 
         // POST: Venues/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateVenueDTO dto)
         {
-            if (id != dto.VenueId) return NotFound();
+            if (id != dto.Id) return NotFound();
 
-            var validator = new UpdateVenueValidator();
-            var result = validator.Validate(dto);
-
+            var result = new UpdateVenueValidator().Validate(dto);
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
-
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
-
-            try
-            {
-                await _mediator.Send(new UpdateVenueCommand(dto));
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                ModelState.AddModelError("", "Update failed.");
-                return View(dto);
-            }
+            await _mediator.Send(new UpdateVenueCommand(dto));
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Venues/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
-
-            var venues = await _mediator.Send(new GetAllVenuesQuery());
-            var venue = venues.FirstOrDefault(v => v.VenueId == id);
-            if (venue == null) return NotFound();
-
-            return View(venue);
+            var list = await _mediator.Send(new GetAllVenuesQuery());
+            var item = list.FirstOrDefault(v => v.Id == id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
         // POST: Venues/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _mediator.Send(new DeleteVenueCommand(id));

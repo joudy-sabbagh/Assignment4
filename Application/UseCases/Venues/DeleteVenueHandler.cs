@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Interfaces;
 using MediatR;
 
@@ -7,10 +9,8 @@ namespace Application.UseCases.Venues
     {
         private readonly IVenueRepository _venueRepo;
 
-        public DeleteVenueHandler(IVenueRepository venueRepo)
-        {
+        public DeleteVenueHandler(IVenueRepository venueRepo) =>
             _venueRepo = venueRepo;
-        }
 
         public async Task Handle(DeleteVenueCommand request, CancellationToken cancellationToken)
         {

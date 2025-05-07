@@ -1,56 +1,40 @@
-@model IEnumerable<Domain.Entities.Event>
-    @using Presentation.Models
-    @using System.Collections.Generic
-    @using System.Linq
+@* Views/Events/Index.cshtml *@
+@model IEnumerable<Application.DTOs.EventListDTO>
 
     @{
     ViewData["Title"] = "Events";
-    // Get the search term from the query string.
-    var searchString = ViewContext.HttpContext.Request.Query["searchString"].ToString();
     }
 
-    <h2>Events</h2>
+    <h1>Events</h1>
+    <p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
 
-    <!-- Search Form -->
-    <form method="get" asp-action="Index" class="form-inline mb-3">
-        <div class="form-group">
-            <input type="text" name="searchString" value="@searchString" placeholder="Search events..." class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary ml-2">Search</button>
-    </form>
-
-    <a class="btn btn-primary mb-3" asp-action="Create">Add New Event</a>
-
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Event Date</th>
-                <th>Venue</th>
+                <th>Date</th>
                 <th>Normal Price</th>
                 <th>VIP Price</th>
                 <th>Backstage Price</th>
-                <th>Actions</th>
+                <th>Venue</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @if (Model != null)
-        {
-            foreach (var ev in Model)
-            {
+            @foreach (var ev in Model)
+    {
             <tr>
                 <td>@ev.Name</td>
-                <td>@ev.EventDate.ToShortDateString()</td>
-                <td>@ev.Venue?.Name</td>
+                <td>@ev.EventDate:yyyy-MM-dd</td>
                 <td>@ev.NormalPrice</td>
                 <td>@ev.VIPPrice</td>
                 <td>@ev.BackstagePrice</td>
+                <td>@ev.VenueName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@ev.EventId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@ev.EventId">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@ev.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@ev.Id">Delete</a>
                 </td>
             </tr>
-            }
-        }
+    }
         </tbody>
     </table>

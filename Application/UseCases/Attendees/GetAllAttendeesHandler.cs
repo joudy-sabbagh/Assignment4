@@ -1,26 +1,34 @@
-using System.Collections.Generic;      // for List<T>
-using System.Linq;                     // for .ToList()
-using System.Threading;                // for CancellationToken
-using System.Threading.Tasks;          // for Task<T>
-using Domain.Entities;
+// Application/UseCases/Attendees/GetAllAttendeesHandler.cs
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
 
 namespace Application.UseCases.Attendees
 {
-    public class GetAllAttendeesHandler : IRequestHandler<GetAllAttendeesQuery, List<Attendee>>
+    public class GetAllAttendeesHandler
+        : IRequestHandler<GetAllAttendeesQuery, List<AttendeeListDTO>>
     {
-        private readonly IAttendeeRepository _attendeeRepo;
+        private readonly IAttendeeRepository _repo;
+        private readonly IMapper _mapper;
 
-        public GetAllAttendeesHandler(IAttendeeRepository attendeeRepo)
+        public GetAllAttendeesHandler(
+            IAttendeeRepository repo,
+            IMapper mapper)
         {
-            _attendeeRepo = attendeeRepo;
+            _repo = repo;
+            _mapper = mapper;
         }
 
-        public async Task<List<Attendee>> Handle(GetAllAttendeesQuery request, CancellationToken cancellationToken)
+        public async Task<List<AttendeeListDTO>> Handle(
+            GetAllAttendeesQuery request,
+            CancellationToken cancellationToken)
         {
-            return (await _attendeeRepo.GetAllAsync()).ToList();
-
+            var entities = await _repo.GetAllAsync();
+            return _mapper.Map<List<AttendeeListDTO>>(entities);
         }
     }
 }
