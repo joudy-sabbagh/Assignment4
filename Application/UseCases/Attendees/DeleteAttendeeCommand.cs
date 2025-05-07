@@ -1,14 +1,8 @@
+// Application/UseCases/Attendees/DeleteAttendeeCommand.cs
 using MediatR;
 
 namespace Application.UseCases.Attendees
 {
-    public class DeleteAttendeeCommand : IRequest
-    {
-        public int Id { get; }
-
-        public DeleteAttendeeCommand(int id)
-        {
-            Id = id;
-        }
-    }
+    // Changed from IRequest to IRequest<Unit>
+    public record DeleteAttendeeCommand(int Id) : IRequest<Unit>;
 }

@@ -1,15 +1,9 @@
-using Application.DTOs;
+// Application/UseCases/Attendees/UpdateAttendeeCommand.cs
 using MediatR;
+using Application.DTOs;
 
 namespace Application.UseCases.Attendees
 {
-    public class UpdateAttendeeCommand : IRequest
-    {
-        public UpdateAttendeeDTO Dto { get; }
-
-        public UpdateAttendeeCommand(UpdateAttendeeDTO dto)
-        {
-            Dto = dto;
-        }
-    }
+    // Changed from IRequest to IRequest<Unit>
+    public record UpdateAttendeeCommand(UpdateAttendeeDTO Dto) : IRequest<Unit>;
 }

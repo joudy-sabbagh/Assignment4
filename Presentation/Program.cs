@@ -1,7 +1,8 @@
+// Program.cs
 using System.Globalization;
-using System.Reflection;
-using Application.UseCases.Tickets;
 using Application.Mapping;
+using Application.UseCases.Attendees;
+using Application.UseCases.Tickets;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -9,38 +10,38 @@ using MediatR;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Application.UseCases.Attendees;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Configure Serilog before building the host
+// 1. Bootstrap Serilog from appsettings.json
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// 2) Enforce en-US culture
-CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+// 2. Culture
+var enCulture = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentCulture = enCulture;
+CultureInfo.DefaultThreadCurrentUICulture = enCulture;
 
-// 3) Add MVC
+// 3. MVC
 builder.Services.AddControllersWithViews();
 
-// 4) AutoMapper
+// 4. AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// 5) MediatR
+// 5. MediatR
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateAttendeeHandler).Assembly)
 );
 
-// 6) EF Core / SQLite
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+// 6. EF Core
+builder.Services.AddDbContext<AppDbContext>(o =>
+    o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// 7) DI for your Repositories
+// 7. DI
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
@@ -48,16 +49,15 @@ builder.Services.AddScoped<IAttendeeRepository, AttendeeRepository>();
 
 var app = builder.Build();
 
-// 8) Localization
-var supportedCultures = new[] { new CultureInfo("en-US") };
+// 8. Localization
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
-    DefaultRequestCulture = new RequestCulture("en-US"),
-    SupportedCultures = supportedCultures,
-    SupportedUICultures = supportedCultures
+    DefaultRequestCulture = new RequestCulture(enCulture),
+    SupportedCultures = new[] { enCulture },
+    SupportedUICultures = new[] { enCulture }
 });
 
-// 9) Middleware
+// 9. Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -68,12 +68,20 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-// 10) Endpoints
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-);
+// 10. Endpoints
+app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
-// 11) Start & flush logs
-app.Run();
-Log.CloseAndFlush();
+// 11. Run
+try
+{
+    Log.Information("Application starting up");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
