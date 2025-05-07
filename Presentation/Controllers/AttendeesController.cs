@@ -4,7 +4,7 @@ using Application.UseCases.Attendees;
 using Application.Validators;
 using MediatR;
 
-namespace MyMVCApp.Controllers
+namespace Presentation.Controllers
 {
     public class AttendeesController : Controller
     {

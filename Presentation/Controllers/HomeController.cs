@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyMVCApp.Models;
 using System.Diagnostics;
 
-namespace MyMVCApp.Controllers
+namespace Presentation.Controllers
 {
     public class HomeController : Controller
     {

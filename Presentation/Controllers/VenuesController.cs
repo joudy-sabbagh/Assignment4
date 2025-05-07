@@ -5,7 +5,7 @@ using Application.UseCases.Venues;
 using Domain.Interfaces;
 using MediatR;
 
-namespace MyMVCApp.Controllers
+namespace Presentation.Controllers
 {
     public class VenuesController : Controller
     {
