@@ -17,9 +17,17 @@ namespace Application.UseCases.Attendees
         {
             var dto = request.Dto;
             var attendee = await _attendeeRepo.GetByIdAsync(dto.AttendeeId);
+
+            if (attendee == null)
+            {
+                // You can throw an exception, return an error result, or handle it gracefully
+                throw new Exception($"Attendee with ID {dto.AttendeeId} not found.");
+            }
+
             attendee.Name = dto.Name;
             attendee.Email = dto.Email;
             await _attendeeRepo.UpdateAsync(attendee);
         }
+
     }
 }
