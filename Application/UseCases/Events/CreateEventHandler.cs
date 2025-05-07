@@ -3,25 +3,26 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Events
 {
     public class CreateEventHandler : IRequestHandler<CreateEventCommand, int>
     {
         private readonly IEventRepository _eventRepo;
+        private readonly ILogger<CreateEventHandler> _logger;
 
-        public CreateEventHandler(IEventRepository eventRepo)
+        public CreateEventHandler(IEventRepository eventRepo, ILogger<CreateEventHandler> logger)
         {
             _eventRepo = eventRepo;
+            _logger = logger;
         }
 
         public async Task<int> Handle(CreateEventCommand request, CancellationToken cancellationToken)
         {
-            var dto = request.Dto;
+            _logger.LogInformation("Creating event {@Dto}", request.Dto);
 
-            // Instantiate via your domain constructor (with guard clauses)
+            var dto = request.Dto;
             var newEvent = new Event(
                 dto.Name,
                 dto.EventDate,
@@ -32,8 +33,7 @@ namespace Application.UseCases.Events
             );
 
             await _eventRepo.AddAsync(newEvent);
-
-            // Return the new single Id
+            _logger.LogInformation("Created Event with Id {EventId}", newEvent.Id);
             return newEvent.Id;
         }
     }

@@ -1,15 +1,13 @@
+// Application/UseCases/Events/UpdateEventCommand.cs
 using Application.DTOs;
 using MediatR;
 
 namespace Application.UseCases.Events
 {
-    public class UpdateEventCommand : IRequest
+    // now implements IRequest<Unit>
+    public class UpdateEventCommand : IRequest<Unit>
     {
         public UpdateEventDTO Dto { get; }
-
-        public UpdateEventCommand(UpdateEventDTO dto)
-        {
-            Dto = dto;
-        }
+        public UpdateEventCommand(UpdateEventDTO dto) => Dto = dto;
     }
 }

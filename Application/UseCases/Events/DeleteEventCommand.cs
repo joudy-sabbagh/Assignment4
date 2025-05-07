@@ -1,14 +1,12 @@
+// Application/UseCases/Events/DeleteEventCommand.cs
 using MediatR;
 
 namespace Application.UseCases.Events
 {
-    public class DeleteEventCommand : IRequest
+    // now implements IRequest<Unit>
+    public class DeleteEventCommand : IRequest<Unit>
     {
         public int Id { get; }
-
-        public DeleteEventCommand(int id)
-        {
-            Id = id;
-        }
+        public DeleteEventCommand(int id) => Id = id;
     }
 }
