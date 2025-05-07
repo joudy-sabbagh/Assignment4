@@ -1,4 +1,4 @@
-﻿@model MyMVCApp.Models.ErrorViewModel
+﻿@model Presentation.Models.ErrorViewModel
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,9 +12,9 @@
         <p class="lead">An unexpected error occurred. Please try again later.</p>
         @if (Model.ShowRequestId)
         {
-            <p>
-                <strong>Request ID:</strong> <code>@Model.RequestId</code>
-            </p>
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
         }
     </div>
 </body>

@@ -2,8 +2,8 @@ namespace Application.DTOs
 {
     public class UpdateAttendeeDTO
     {
-        public int AttendeeId { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public required int AttendeeId { get; init; }
+        public required string Name { get; init; }
+        public required string Email { get; init; }
     }
 }

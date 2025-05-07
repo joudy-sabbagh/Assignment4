@@ -2,7 +2,7 @@ namespace Application.DTOs
 {
     public class CreateAttendeeDTO
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public required string Name { get; init; }
+        public required string Email { get; init; }
     }
 }

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.UseCases.Venues
 {
-    public class UpdateVenueCommand : IRequest
+    public class UpdateVenueCommand : IRequest<bool>
     {
         public UpdateVenueDTO Dto { get; }
 

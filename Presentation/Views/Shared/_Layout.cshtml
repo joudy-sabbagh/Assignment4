@@ -43,10 +43,18 @@
             <small>&copy; @DateTime.Now.Year – Event Manager</small>
         </div>
     </footer>
+    <!-- jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJ+Y3Kp9FbJ1K8Cj9kYnvLFiTwx7rXxR0G5hY="
+            crossorigin="anonymous"></script>
+
+    <!-- Then validation libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
 
     <!-- Bootstrap JS (bundle includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384‑qQ1fvR0OlyQF1iB60dEzvQZF4zsKIUj4XVoLr49+hgv/ST2eReLpxTURy4y6Z4z4"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoYkM+FhcXnE1sH1+d5QqoV9Y5nU5mZ5S1m0SB5xHYjkQbi"
             crossorigin="anonymous"></script>
 
     @RenderSection("Scripts", required: false)

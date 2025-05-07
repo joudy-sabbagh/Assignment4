@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using Application.UseCases.Tickets;
 using Application.Mapping;
 using Domain.Interfaces;
 using Infrastructure.Data;
@@ -30,7 +31,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // 5) MediatR
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+{
+    cfg.RegisterServicesFromAssembly(typeof(GetAllTicketsHandler).Assembly);
+});
 
 // 6) EF Core / SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
