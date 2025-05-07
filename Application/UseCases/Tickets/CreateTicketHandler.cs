@@ -6,6 +6,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Tickets
 {
@@ -13,39 +14,36 @@ namespace Application.UseCases.Tickets
     {
         private readonly ITicketRepository _ticketRepo;
         private readonly IEventRepository _eventRepo;
+        private readonly ILogger<CreateTicketHandler> _logger;
 
         public CreateTicketHandler(
             ITicketRepository ticketRepo,
-            IEventRepository eventRepo)
+            IEventRepository eventRepo,
+            ILogger<CreateTicketHandler> logger)
         {
             _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
+            _logger = logger;
         }
 
         public async Task<int> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Creating ticket {@Dto}", request.Dto);
+
             var dto = request.Dto;
+            var ev = await _eventRepo.GetByIdAsync(dto.EventId)
+                      ?? throw new KeyNotFoundException($"Event {dto.EventId} not found");
 
-            // 1. Ensure the event exists
-            var ev = await _eventRepo.GetByIdAsync(dto.EventId);
-            if (ev == null)
-                throw new KeyNotFoundException($"Event with ID {dto.EventId} not found.");
-
-            // 2. Determine price based on type
             var price = dto.TicketType switch
             {
-                "Normal" => ev.NormalPrice,
                 "VIP" => ev.VIPPrice,
                 "Backstage" => ev.BackstagePrice,
                 _ => ev.NormalPrice
             };
-
-            // 3. Parse the enum category (fallback to Normal if invalid)
             var category = Enum.TryParse<TicketCategory>(dto.TicketType, true, out var cat)
                 ? cat
                 : TicketCategory.Normal;
 
-            // 4. Use the domain constructor (with guard clauses)
             var ticket = new Ticket(
                 dto.TicketType,
                 price,
@@ -54,8 +52,9 @@ namespace Application.UseCases.Tickets
                 dto.AttendeeId
             );
 
-            // 5. Persist and return the new Id
             await _ticketRepo.AddAsync(ticket);
+
+            _logger.LogInformation("Created Ticket with Id {TicketId}", ticket.Id);
             return ticket.Id;
         }
     }

@@ -6,46 +6,47 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Tickets
 {
-    public class UpdateTicketHandler : IRequestHandler<UpdateTicketCommand>
+    public class UpdateTicketHandler : IRequestHandler<UpdateTicketCommand, Unit>
     {
         private readonly ITicketRepository _ticketRepo;
         private readonly IEventRepository _eventRepo;
+        private readonly ILogger<UpdateTicketHandler> _logger;
 
         public UpdateTicketHandler(
             ITicketRepository ticketRepo,
-            IEventRepository eventRepo)
+            IEventRepository eventRepo,
+            ILogger<UpdateTicketHandler> logger)
         {
             _ticketRepo = ticketRepo;
             _eventRepo = eventRepo;
+            _logger = logger;
         }
 
-        public async Task Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
-            var ticket = await _ticketRepo.GetByIdAsync(dto.Id);
-            if (ticket == null)
-                throw new KeyNotFoundException($"Ticket with ID {dto.Id} not found.");
+            _logger.LogInformation("Updating ticket {Id} with {@Dto}", dto.Id, dto);
 
-            var ev = await _eventRepo.GetByIdAsync(dto.EventId);
-            if (ev == null)
-                throw new KeyNotFoundException($"Event with ID {dto.EventId} not found.");
+            var ticket = await _ticketRepo.GetByIdAsync(dto.Id)
+                         ?? throw new KeyNotFoundException($"Ticket {dto.Id} not found");
 
-            // recalc price and category
+            var ev = await _eventRepo.GetByIdAsync(dto.EventId)
+                     ?? throw new KeyNotFoundException($"Event {dto.EventId} not found");
+
             var price = dto.TicketType switch
             {
                 "VIP" => ev.VIPPrice,
                 "Backstage" => ev.BackstagePrice,
                 _ => ev.NormalPrice
             };
-            var category = Enum.TryParse<TicketCategory>(
-                dto.TicketType, true, out var cat)
+            var category = Enum.TryParse<TicketCategory>(dto.TicketType, true, out var cat)
                 ? cat
                 : TicketCategory.Normal;
 
-            // use domain helper
             ticket.UpdateTypeAndPrice(
                 dto.TicketType,
                 price,
@@ -55,6 +56,9 @@ namespace Application.UseCases.Tickets
             );
 
             await _ticketRepo.UpdateAsync(ticket);
+
+            _logger.LogInformation("Updated ticket {Id}", dto.Id);
+            return Unit.Value;
         }
     }
 }
