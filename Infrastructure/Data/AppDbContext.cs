@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -39,6 +40,24 @@ namespace Infrastructure.Data
                 .HasOne(t => t.Attendee)
                 .WithMany(a => a.Tickets)
                 .HasForeignKey(t => t.AttendeeId);
+
+            // EmailAddress VO mapping
+            modelBuilder.Entity<Attendee>()
+                .Property(a => a.Email)
+                .HasConversion(
+                    e => e.Value,
+                    v => new EmailAddress(v))
+                .HasColumnName("Email")
+                .IsRequired();
+
+            // Money VO mapping
+            modelBuilder.Entity<Ticket>()
+                .Property(t => t.Price)
+                .HasConversion(
+                    m => m.Amount,
+                    v => new Money(v))
+                .HasColumnName("Price")
+                .IsRequired();
         }
     }
 }

@@ -1,8 +1,11 @@
-namespace Application.DTOs;
-
-public class CreateTicketDTO
+// Application/DTOs/CreateTicketDTO.cs
+namespace Application.DTOs
 {
-    public int EventId { get; set; }
-    public int AttendeeId { get; set; }
-    public string TicketType { get; set; } = null!;
+    public class CreateTicketDTO
+    {
+        public required int EventId { get; init; }
+        public required int AttendeeId { get; init; }
+        public required string TicketType { get; init; }
+        public required decimal Price { get; init; }
+    }
 }

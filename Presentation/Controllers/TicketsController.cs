@@ -1,4 +1,3 @@
-// Presentation/Controllers/TicketsController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,6 @@ namespace Presentation.Controllers
             _logger = logger;
         }
 
-        // GET: Tickets
         public async Task<IActionResult> Index(
             string sortOrder,
             int? eventFilter,
@@ -52,7 +50,6 @@ namespace Presentation.Controllers
             return View(list);
         }
 
-        // GET: Tickets/Create
         public async Task<IActionResult> Create()
         {
             _logger.LogInformation("Rendering Create Ticket form");
@@ -62,7 +59,6 @@ namespace Presentation.Controllers
             return View();
         }
 
-        // POST: Tickets/Create
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
@@ -85,7 +81,6 @@ namespace Presentation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Ticket {Id}", id);
@@ -107,11 +102,11 @@ namespace Presentation.Controllers
                 Id = item.Id,
                 EventId = item.EventId,
                 AttendeeId = item.AttendeeId,
-                TicketType = item.Category
+                TicketType = item.Category,
+                Price = item.Price
             });
         }
 
-        // POST: Tickets/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
@@ -140,7 +135,6 @@ namespace Presentation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Tickets/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Ticket {Id}", id);
@@ -156,7 +150,6 @@ namespace Presentation.Controllers
             return View(item);
         }
 
-        // POST: Tickets/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

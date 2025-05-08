@@ -1,4 +1,3 @@
-// Program.cs
 using System.Globalization;
 using Application.Mapping;
 using Application.UseCases.Attendees;
@@ -14,7 +13,7 @@ using Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Bootstrap Serilog from appsettings.json
+// 1. Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -36,9 +35,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateAttendeeHandler).Assembly)
 );
-
 builder.Services.AddMediatR(cfg =>
-  cfg.RegisterServicesFromAssembly(typeof(CreateTicketHandler).Assembly)
+    cfg.RegisterServicesFromAssembly(typeof(CreateTicketHandler).Assembly)
 );
 
 // 6. EF Core
@@ -47,7 +45,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 );
 
 // 7. DI
-builder.Services.AddScoped<ITicketPricingService, TicketPricingService>();
+// Removed ITicketPricingService registration
 builder.Services.AddScoped<IEventValidationService, EventValidationService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();

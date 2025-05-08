@@ -1,6 +1,7 @@
 // Application/Mapping/MappingProfile.cs
 using AutoMapper;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Application.DTOs;
 
 namespace Application.Mapping
@@ -9,7 +10,9 @@ namespace Application.Mapping
     {
         public MappingProfile()
         {
-            // Command-side mappings
+            CreateMap<Money, decimal>().ConvertUsing(m => m.Amount);
+            CreateMap<EmailAddress, string>().ConvertUsing(e => e.Value);
+
             CreateMap<CreateAttendeeDTO, Attendee>();
             CreateMap<UpdateAttendeeDTO, Attendee>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
@@ -26,22 +29,19 @@ namespace Application.Mapping
             CreateMap<UpdateVenueDTO, Venue>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-            // Read-side (list) mappings
-            CreateMap<Attendee, AttendeeListDTO>();
+            CreateMap<Attendee, AttendeeListDTO>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
             CreateMap<Venue, VenueListDTO>();
 
             CreateMap<Event, EventListDTO>()
-                .ForMember(dest => dest.VenueId,
-                           opt => opt.MapFrom(src => src.VenueId));
+                .ForMember(dest => dest.VenueId, opt => opt.MapFrom(src => src.VenueId));
 
             CreateMap<Ticket, TicketListDTO>()
-                .ForMember(dest => dest.Category,
-                           opt => opt.MapFrom(src => src.Category.ToString()))
-                .ForMember(dest => dest.EventId,
-                           opt => opt.MapFrom(src => src.EventId))
-                .ForMember(dest => dest.AttendeeId,
-                           opt => opt.MapFrom(src => src.AttendeeId));
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()))
+                .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
+                .ForMember(dest => dest.AttendeeId, opt => opt.MapFrom(src => src.AttendeeId));
         }
     }
 }

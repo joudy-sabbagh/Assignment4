@@ -1,8 +1,13 @@
 // Application/UseCases/Attendees/UpdateAttendeeHandler.cs
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Application.DTOs;
 using Domain.Interfaces;
+using Domain.ValueObjects;
 
 namespace Application.UseCases.Attendees
 {
@@ -31,9 +36,12 @@ namespace Application.UseCases.Attendees
                 throw new KeyNotFoundException($"Attendee with ID {dto.Id} not found.");
             }
 
-            attendee.Update(dto.Name, dto.Email);
-            await _repo.UpdateAsync(attendee);
+            attendee.Update(
+                dto.Name,
+                new EmailAddress(dto.Email)
+            );
 
+            await _repo.UpdateAsync(attendee);
             _logger.LogInformation("Updated attendee {Id}", dto.Id);
             return Unit.Value;
         }
