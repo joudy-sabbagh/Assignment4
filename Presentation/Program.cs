@@ -36,6 +36,11 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateAttendeeHandler).Assembly)
 );
+
+builder.Services.AddMediatR(cfg =>
+  cfg.RegisterServicesFromAssembly(typeof(CreateTicketHandler).Assembly)
+);
+
 // 6. EF Core
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -43,6 +48,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 
 // 7. DI
 builder.Services.AddScoped<ITicketPricingService, TicketPricingService>();
+builder.Services.AddScoped<IEventValidationService, EventValidationService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
