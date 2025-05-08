@@ -75,17 +75,19 @@ namespace Presentation.Controllers
         }
 
         // POST: Tickets/Create
+        // POST: Tickets/Create
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
             _logger.LogInformation("Received CreateTicket request for {@Dto}", dto);
 
-            var validation = new CreateTicketValidator().Validate(dto);
-            if (!validation.IsValid)
+            // 1. Validate input
+            var validationResult = new CreateTicketValidator().Validate(dto);
+            if (!validationResult.IsValid)
             {
-                _logger.LogWarning("CreateTicketDTO validation failed: {@Errors}", validation.Errors);
-                foreach (var err in validation.Errors)
-                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
+                _logger.LogWarning("CreateTicketDTO validation failed: {@Errors}", validationResult.Errors);
+                foreach (var error in validationResult.Errors)
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
 
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
@@ -93,29 +95,72 @@ namespace Presentation.Controllers
                 return View(dto);
             }
 
-            // 1) create the ticket
+            // 2. Create the ticket
             var ticketId = await _mediator.Send(new CreateTicketCommand(dto));
             _logger.LogInformation("Ticket created with Id {TicketId}", ticketId);
 
-            // 2) lookup the attendee to get their email
+            // 3. Lookup attendee and event for email
             var attendee = await _attendeeRepo.GetByIdAsync(dto.AttendeeId);
-            if (attendee != null)
-            {
-                // extract the string from the value object:
-                var emailString = attendee.Email.Value;      // or .Address or .ToString()
+            var ev = await _eventRepo.GetByIdAsync(dto.EventId);
 
+            if (attendee != null && ev != null)
+            {
+                var name = attendee.Name;
+                var email = attendee.Email.Value;       // extract string from VO
+                var eventName = ev.Name;                    // your Event entity’s Name
+                var ticketTier = dto.TicketType.ToString();
+
+                // 4a. Build plain text message
+                var plainTextContent = $@"
+Hello {name},
+
+Thank you for booking with us!
+
+Event       : {eventName}
+Ticket Tier : {ticketTier}
+Ticket ID   : {ticketId}
+
+We look forward to seeing you there.
+
+Best regards,
+Event Manager Team
+";
+
+                // 4b. Build HTML message
+                var htmlContent = $@"
+<p>Hello <strong>{name}</strong>,</p>
+
+<p>Thank you for booking with us! Here are your details:</p>
+
+<ul>
+  <li><strong>Event:</strong> {eventName}</li>
+  <li><strong>Ticket Tier:</strong> {ticketTier}</li>
+  <li><strong>Ticket ID:</strong> {ticketId}</li>
+</ul>
+
+<p>We look forward to seeing you there.</p>
+
+<p>Best regards,<br/>
+<strong>Event Manager Team</strong></p>
+";
+
+                // 5. Send confirmation email
                 await _emailService.SendEmailAsync(
-                    toEmail: emailString,
-                    subject: "Your Ticket Confirmation",
-                    plainTextContent: $"Thanks for registering! Your ticket id is {ticketId}.",
-                    htmlContent: $"<strong>Thanks for registering!</strong><br/>Ticket ID: {ticketId}"
+                    toEmail: email,
+                    subject: $"Your {eventName} Ticket Confirmation",
+                    plainTextContent: plainTextContent,
+                    htmlContent: htmlContent
                 );
             }
             else
             {
-                _logger.LogWarning("Could not send email: attendee {AttendeeId} not found", dto.AttendeeId);
+                _logger.LogWarning(
+                    "Could not send email: attendee or event not found (Attendee={AttId}, Event={EvtId})",
+                    dto.AttendeeId, dto.EventId
+                );
             }
 
+            // 6. Redirect back to list
             return RedirectToAction(nameof(Index));
         }
 

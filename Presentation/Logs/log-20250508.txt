@@ -771,6 +771,7 @@ Price
 2025-05-08 14:46:32 [Information] Fetching all venues
 2025-05-08 14:46:32 [Information] Handling GetAllVenuesQuery
 2025-05-08 14:46:32 [Information] Retrieved 2 venues
+<<<<<<< HEAD
 2025-05-08 15:39:50 [Information] Application starting up
 2025-05-08 15:39:50 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
 2025-05-08 15:40:17 [Information] Fetching tickets (sort=null, event=null, category=null)
@@ -883,3 +884,25 @@ System.InvalidOperationException: Missing SENDGRID_API_KEY
 2025-05-08 15:51:08 [Information] Fetching tickets (sort=null, event=null, category=null)
 2025-05-08 15:51:08 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
 2025-05-08 15:51:08 [Information] Retrieved 5 tickets
+=======
+>>>>>>> 193ea260f7e56392b3c70aff8654205e39ce26ab
+2025-05-08 16:04:47 [Information] Application starting up
+2025-05-08 16:04:48 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 16:04:56 [Information] Rendering Delete confirmation for Ticket 1
+2025-05-08 16:04:57 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-08 16:04:59 [Information] Retrieved 5 tickets
+2025-05-08 16:05:01 [Information] Deleting Ticket 1
+2025-05-08 16:05:01 [Information] Deleting ticket 1
+2025-05-08 16:05:02 [Information] Deleted ticket 1
+2025-05-08 16:05:02 [Information] Ticket 1 deleted
+2025-05-08 16:05:02 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 16:05:02 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 16:05:02 [Information] Retrieved 4 tickets
+2025-05-08 16:05:04 [Information] Rendering Create Ticket form
+2025-05-08 16:05:08 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 3, TicketType: "Normal", Price: 0 }
+2025-05-08 16:05:08 [Information] Ticket purchased with ID 8
+2025-05-08 16:05:08 [Information] Ticket purchased with ID 8
+2025-05-08 16:05:08 [Information] Ticket created with Id 8
+2025-05-08 16:05:10 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 16:05:10 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 16:05:10 [Information] Retrieved 5 tickets
