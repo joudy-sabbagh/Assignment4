@@ -1,6 +1,8 @@
 // Presentation/Controllers/AttendeesController.cs
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Application.Common;            
 using Application.DTOs;
 using Application.UseCases.Attendees;
 using Application.Validators;
@@ -25,9 +27,17 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation("Fetching all attendees");
-            var model = await _mediator.Send(new GetAllAttendeesQuery());
-            _logger.LogInformation("Retrieved {Count} attendees", model?.Count() ?? 0);
-            return View(model);
+            var result = await _mediator.Send(new GetAllAttendeesQuery());
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch attendees: {Error}", result.Error);
+                ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                // pass an empty list to keep the UI intact
+                return View(Enumerable.Empty<AttendeeListDTO>());
+            }
+
+            return View(result.Value);
         }
 
         // GET: Attendees/Create
@@ -43,17 +53,17 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Received Create request for {@Dto}", dto);
 
-            var result = new CreateAttendeeValidator().Validate(dto);
-            if (!result.IsValid)
+            var validation = new CreateAttendeeValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("Validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(err => ModelState.AddModelError(string.Empty, err.ErrorMessage));
+                _logger.LogWarning("Validation failed: {@Errors}", validation.Errors);
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
 
             var newId = await _mediator.Send(new CreateAttendeeCommand(dto));
             _logger.LogInformation("Attendee created with Id {Id}", newId);
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -61,11 +71,18 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Attendee {Id}", id);
+            var result = await _mediator.Send(new GetAllAttendeesQuery());
 
-            var item = (await _mediator.Send(new GetAllAttendeesQuery())).FirstOrDefault(a => a.Id == id);
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch for edit: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var item = result.Value.FirstOrDefault(a => a.Id == id);
             if (item == null)
             {
-                _logger.LogWarning("Attendee {Id} not found for edit", id);
+                _logger.LogWarning("Attendee {Id} not found", id);
                 return NotFound();
             }
 
@@ -76,25 +93,19 @@ namespace Presentation.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateAttendeeDTO dto)
         {
-            _logger.LogInformation("Received Edit request for Attendee {Id}: {@Dto}", id, dto);
+            _logger.LogInformation("Received Edit request: {Id}", id);
+            if (id != dto.Id) return NotFound();
 
-            if (id != dto.Id)
+            var validation = new UpdateAttendeeValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("Route id {RouteId} does not match DTO id {DtoId}", id, dto.Id);
-                return NotFound();
-            }
-
-            var result = new UpdateAttendeeValidator().Validate(dto);
-            if (!result.IsValid)
-            {
-                _logger.LogWarning("Validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(err => ModelState.AddModelError(string.Empty, err.ErrorMessage));
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
 
             await _mediator.Send(new UpdateAttendeeCommand(dto));
-            _logger.LogInformation("Attendee {Id} updated successfully", id);
-
+            _logger.LogInformation("Attendee {Id} updated", id);
             return RedirectToAction(nameof(Index));
         }
 
@@ -102,13 +113,16 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Attendee {Id}", id);
+            var result = await _mediator.Send(new GetAllAttendeesQuery());
 
-            var item = (await _mediator.Send(new GetAllAttendeesQuery())).FirstOrDefault(a => a.Id == id);
-            if (item == null)
+            if (!result.IsSuccess)
             {
-                _logger.LogWarning("Attendee {Id} not found for deletion", id);
-                return NotFound();
+                _logger.LogWarning("Failed to fetch for deletion: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
             }
+
+            var item = result.Value.FirstOrDefault(a => a.Id == id);
+            if (item == null) return NotFound();
 
             return View(item);
         }
@@ -119,7 +133,6 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Deleting Attendee {Id}", id);
             await _mediator.Send(new DeleteAttendeeCommand(id));
-            _logger.LogInformation("Attendee {Id} deleted", id);
             return RedirectToAction(nameof(Index));
         }
     }

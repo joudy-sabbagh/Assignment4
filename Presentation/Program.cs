@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Domain.Services;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Serilog
@@ -43,6 +45,9 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services
+    .AddScoped<Application.Interfaces.IEmailService, Infrastructure.Services.SendGridEmailService>();
 
 // 7. DI
 // Removed ITicketPricingService registration

@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Application.Common;            
 using Application.DTOs;
 using Application.UseCases.Tickets;
 using Application.Validators;
@@ -9,11 +11,13 @@ using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Application.Interfaces;
 
 namespace Presentation.Controllers
 {
     public class TicketsController : Controller
     {
+        private readonly IEmailService _emailService;    
         private readonly IMediator _mediator;
         private readonly IEventRepository _eventRepo;
         private readonly IAttendeeRepository _attendeeRepo;
@@ -23,33 +27,44 @@ namespace Presentation.Controllers
             IMediator mediator,
             IEventRepository eventRepo,
             IAttendeeRepository attendeeRepo,
-            ILogger<TicketsController> logger)
+            ILogger<TicketsController> logger,
+            IEmailService emailService)           
         {
             _mediator = mediator;
             _eventRepo = eventRepo;
             _attendeeRepo = attendeeRepo;
             _logger = logger;
+            _emailService = emailService;        
         }
 
+        // GET: Tickets
         public async Task<IActionResult> Index(
             string sortOrder,
             int? eventFilter,
             string categoryFilter)
         {
-            _logger.LogInformation("Fetching tickets (sort={Sort}, event={Event}, category={Cat})",
-                sortOrder, eventFilter, categoryFilter);
+            _logger.LogInformation(
+              "Fetching tickets (sort={Sort}, event={Event}, category={Cat})",
+               sortOrder, eventFilter, categoryFilter);
 
             ViewData["Events"] = await _eventRepo.GetAllAsync();
             ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory));
 
-            var list = await _mediator.Send(
+            var result = await _mediator.Send(
                 new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
             );
 
-            _logger.LogInformation("Retrieved {Count} tickets", list.Count);
-            return View(list);
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch tickets: {Error}", result.Error);
+                ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                return View(Enumerable.Empty<TicketListDTO>());
+            }
+
+            return View(result.Value);
         }
 
+        // GET: Tickets/Create
         public async Task<IActionResult> Create()
         {
             _logger.LogInformation("Rendering Create Ticket form");
@@ -59,34 +74,65 @@ namespace Presentation.Controllers
             return View();
         }
 
+        // POST: Tickets/Create
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
             _logger.LogInformation("Received CreateTicket request for {@Dto}", dto);
 
-            var result = new CreateTicketValidator().Validate(dto);
-            if (!result.IsValid)
+            var validation = new CreateTicketValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("CreateTicketDTO validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(err => ModelState.AddModelError(string.Empty, err.ErrorMessage));
+                _logger.LogWarning("CreateTicketDTO validation failed: {@Errors}", validation.Errors);
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
+
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
                 ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory));
                 return View(dto);
             }
 
+            // 1) create the ticket
             var ticketId = await _mediator.Send(new CreateTicketCommand(dto));
             _logger.LogInformation("Ticket created with Id {TicketId}", ticketId);
+
+            // 2) lookup the attendee to get their email
+            var attendee = await _attendeeRepo.GetByIdAsync(dto.AttendeeId);
+            if (attendee != null)
+            {
+                // extract the string from the value object:
+                var emailString = attendee.Email.Value;      // or .Address or .ToString()
+
+                await _emailService.SendEmailAsync(
+                    toEmail: emailString,
+                    subject: "Your Ticket Confirmation",
+                    plainTextContent: $"Thanks for registering! Your ticket id is {ticketId}.",
+                    htmlContent: $"<strong>Thanks for registering!</strong><br/>Ticket ID: {ticketId}"
+                );
+            }
+            else
+            {
+                _logger.LogWarning("Could not send email: attendee {AttendeeId} not found", dto.AttendeeId);
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
+
+        // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Ticket {Id}", id);
+            var result = await _mediator.Send(new GetAllTicketsQuery("", null, null));
 
-            var item = (await _mediator.Send(new GetAllTicketsQuery("", null, null)))
-                       .FirstOrDefault(t => t.Id == id);
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch tickets for edit: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var item = result.Value.FirstOrDefault(t => t.Id == id);
             if (item == null)
             {
                 _logger.LogWarning("Ticket {Id} not found for edit", id);
@@ -107,22 +153,21 @@ namespace Presentation.Controllers
             });
         }
 
+        // POST: Tickets/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
             _logger.LogInformation("Received UpdateTicket request for {Id}: {@Dto}", id, dto);
 
             if (id != dto.Id)
-            {
-                _logger.LogWarning("Route id {RouteId} does not match DTO id {DtoId}", id, dto.Id);
                 return NotFound();
-            }
 
-            var result = new UpdateTicketValidator().Validate(dto);
-            if (!result.IsValid)
+            var validation = new UpdateTicketValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("UpdateTicketDTO validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(err => ModelState.AddModelError(string.Empty, err.ErrorMessage));
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
+
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
                 ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory));
@@ -131,25 +176,29 @@ namespace Presentation.Controllers
 
             await _mediator.Send(new UpdateTicketCommand(dto));
             _logger.LogInformation("Ticket {Id} updated successfully", id);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Tickets/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Ticket {Id}", id);
+            var result = await _mediator.Send(new GetAllTicketsQuery("", null, null));
 
-            var item = (await _mediator.Send(new GetAllTicketsQuery("", null, null)))
-                       .FirstOrDefault(t => t.Id == id);
-            if (item == null)
+            if (!result.IsSuccess)
             {
-                _logger.LogWarning("Ticket {Id} not found for deletion", id);
-                return NotFound();
+                _logger.LogWarning("Failed to fetch tickets for deletion: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
             }
+
+            var item = result.Value.FirstOrDefault(t => t.Id == id);
+            if (item == null)
+                return NotFound();
 
             return View(item);
         }
 
+        // POST: Tickets/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

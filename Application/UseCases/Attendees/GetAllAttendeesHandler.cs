@@ -1,8 +1,10 @@
 // Application/UseCases/Attendees/GetAllAttendeesHandler.cs
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Application.Common;            
 using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;
@@ -10,7 +12,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases.Attendees
 {
-    public class GetAllAttendeesHandler : IRequestHandler<GetAllAttendeesQuery, List<AttendeeListDTO>>
+    public class GetAllAttendeesHandler
+        : IRequestHandler<GetAllAttendeesQuery, Result<List<AttendeeListDTO>>>
     {
         private readonly IAttendeeRepository _repo;
         private readonly IMapper _mapper;
@@ -26,15 +29,22 @@ namespace Application.UseCases.Attendees
             _logger = logger;
         }
 
-        public async Task<List<AttendeeListDTO>> Handle(GetAllAttendeesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<AttendeeListDTO>>> Handle(
+            GetAllAttendeesQuery request,
+            CancellationToken cancellationToken)
         {
             _logger.LogInformation("Handling GetAllAttendeesQuery");
-
             var entities = await _repo.GetAllAsync();
-            var dtos = _mapper.Map<List<AttendeeListDTO>>(entities);
 
+            if (entities == null || !entities.Any())
+            {
+                _logger.LogWarning("No attendees found");
+                return Result<List<AttendeeListDTO>>.Failure("No attendees available");
+            }
+
+            var dtos = _mapper.Map<List<AttendeeListDTO>>(entities);
             _logger.LogInformation("Retrieved {Count} attendees", dtos.Count);
-            return dtos;
+            return Result<List<AttendeeListDTO>>.Success(dtos);
         }
     }
 }

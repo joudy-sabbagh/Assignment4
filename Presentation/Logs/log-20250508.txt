@@ -701,3 +701,185 @@ Price
 2025-05-08 13:32:21 [Information] Handling GetAllVenuesQuery
 2025-05-08 13:32:21 [Information] Retrieved 2 venues
 2025-05-08 13:32:21 [Information] Retrieved 2 venues
+2025-05-08 14:27:56 [Information] Application starting up
+2025-05-08 14:27:56 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 14:28:00 [Information] Fetching all attendees
+2025-05-08 14:28:00 [Information] Handling GetAllAttendeesQuery
+2025-05-08 14:28:02 [Information] Retrieved 3 attendees
+2025-05-08 14:28:02 [Information] Retrieved 3 attendees
+2025-05-08 14:28:04 [Information] Fetching all events
+2025-05-08 14:28:04 [Information] Handling GetAllEventsQuery
+2025-05-08 14:28:04 [Information] Retrieved 2 events
+2025-05-08 14:28:04 [Information] Retrieved 2 events
+2025-05-08 14:28:05 [Information] Fetching all venues
+2025-05-08 14:28:05 [Information] Handling GetAllVenuesQuery
+2025-05-08 14:28:05 [Information] Retrieved 2 venues
+2025-05-08 14:28:05 [Information] Retrieved 2 venues
+2025-05-08 14:39:44 [Information] Application starting up
+2025-05-08 14:39:44 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 14:41:17 [Information] Application starting up
+2025-05-08 14:41:18 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 14:41:20 [Information] Fetching all events
+2025-05-08 14:41:20 [Information] Handling GetAllEventsQuery
+2025-05-08 14:41:21 [Information] Retrieved 2 events
+2025-05-08 14:41:23 [Information] Fetching all attendees
+2025-05-08 14:41:23 [Information] Handling GetAllAttendeesQuery
+2025-05-08 14:41:23 [Information] Retrieved 3 attendees
+2025-05-08 14:41:23 [Information] Retrieved 3 attendees
+2025-05-08 14:41:24 [Information] Fetching all events
+2025-05-08 14:41:24 [Information] Handling GetAllEventsQuery
+2025-05-08 14:41:24 [Information] Retrieved 2 events
+2025-05-08 14:41:25 [Information] Fetching all venues
+2025-05-08 14:41:25 [Information] Handling GetAllVenuesQuery
+2025-05-08 14:41:25 [Information] Retrieved 2 venues
+2025-05-08 14:41:25 [Information] Retrieved 2 venues
+2025-05-08 14:41:26 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 14:41:26 [Information] Handling GetAllTicketsQuery (sort=null, filterEvent=null, filterCat=null)
+2025-05-08 14:41:26 [Information] Retrieved 5 tickets
+2025-05-08 14:41:26 [Information] Retrieved 5 tickets
+2025-05-08 14:41:27 [Information] Fetching all events
+2025-05-08 14:41:27 [Information] Handling GetAllEventsQuery
+2025-05-08 14:41:27 [Information] Retrieved 2 events
+2025-05-08 14:41:28 [Information] Rendering Create Event form
+2025-05-08 14:46:03 [Information] Application starting up
+2025-05-08 14:46:03 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 14:46:08 [Information] Fetching all venues
+2025-05-08 14:46:09 [Information] Handling GetAllVenuesQuery
+2025-05-08 14:46:10 [Information] Retrieved 2 venues
+2025-05-08 14:46:12 [Information] Fetching all events
+2025-05-08 14:46:12 [Information] Handling GetAllEventsQuery
+2025-05-08 14:46:12 [Information] Fetching all attendees
+2025-05-08 14:46:12 [Information] Handling GetAllAttendeesQuery
+2025-05-08 14:46:12 [Information] Retrieved 2 events
+2025-05-08 14:46:13 [Information] Retrieved 3 attendees
+2025-05-08 14:46:14 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 14:46:14 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 14:46:14 [Information] Retrieved 5 tickets
+2025-05-08 14:46:15 [Information] Fetching all events
+2025-05-08 14:46:15 [Information] Handling GetAllEventsQuery
+2025-05-08 14:46:15 [Information] Retrieved 2 events
+2025-05-08 14:46:24 [Information] Rendering Edit form for Event 1
+2025-05-08 14:46:24 [Information] Handling GetAllEventsQuery
+2025-05-08 14:46:24 [Information] Retrieved 2 events
+2025-05-08 14:46:30 [Information] Received UpdateEvent request for 1: UpdateEventDTO { Id: 1, Name: "Jazz Night", EventDate: 05/22/2025 00:00:00, NormalPrice: 20.00, VIPPrice: 55.00, BackstagePrice: 100.00, VenueId: 1 }
+2025-05-08 14:46:30 [Information] Updating Event 1
+2025-05-08 14:46:30 [Information] Updated Event 1
+2025-05-08 14:46:30 [Information] Event 1 updated successfully
+2025-05-08 14:46:30 [Information] Fetching all events
+2025-05-08 14:46:30 [Information] Handling GetAllEventsQuery
+2025-05-08 14:46:30 [Information] Retrieved 2 events
+2025-05-08 14:46:32 [Information] Fetching all venues
+2025-05-08 14:46:32 [Information] Handling GetAllVenuesQuery
+2025-05-08 14:46:32 [Information] Retrieved 2 venues
+2025-05-08 15:39:50 [Information] Application starting up
+2025-05-08 15:39:50 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 15:40:17 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:20 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:20 [Information] Retrieved 5 tickets
+2025-05-08 15:40:22 [Information] Fetching all attendees
+2025-05-08 15:40:22 [Information] Handling GetAllAttendeesQuery
+2025-05-08 15:40:22 [Information] Retrieved 3 attendees
+2025-05-08 15:40:24 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:24 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:24 [Information] Retrieved 5 tickets
+2025-05-08 15:40:26 [Information] Rendering Create Ticket form
+2025-05-08 15:40:32 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:32 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:32 [Information] Retrieved 5 tickets
+2025-05-08 15:40:39 [Information] Rendering Delete confirmation for Ticket 2
+2025-05-08 15:40:39 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-08 15:40:39 [Information] Retrieved 5 tickets
+2025-05-08 15:40:41 [Information] Deleting Ticket 2
+2025-05-08 15:40:41 [Information] Deleting ticket 2
+2025-05-08 15:40:41 [Information] Deleted ticket 2
+2025-05-08 15:40:41 [Information] Ticket 2 deleted
+2025-05-08 15:40:41 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:41 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:41 [Information] Retrieved 4 tickets
+2025-05-08 15:40:42 [Information] Rendering Delete confirmation for Ticket 5
+2025-05-08 15:40:42 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-08 15:40:42 [Information] Retrieved 4 tickets
+2025-05-08 15:40:44 [Information] Deleting Ticket 5
+2025-05-08 15:40:44 [Information] Deleting ticket 5
+2025-05-08 15:40:44 [Information] Deleted ticket 5
+2025-05-08 15:40:44 [Information] Ticket 5 deleted
+2025-05-08 15:40:44 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:44 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:44 [Information] Retrieved 3 tickets
+2025-05-08 15:40:45 [Information] Rendering Create Ticket form
+2025-05-08 15:40:52 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 2, AttendeeId: 3, TicketType: "Normal", Price: 0 }
+2025-05-08 15:40:52 [Information] Ticket purchased with ID 6
+2025-05-08 15:40:52 [Information] Ticket purchased with ID 6
+2025-05-08 15:40:52 [Information] Ticket created with Id 6
+2025-05-08 15:40:54 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:40:54 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:40:54 [Information] Retrieved 4 tickets
+2025-05-08 15:41:09 [Information] Fetching all attendees
+2025-05-08 15:41:09 [Information] Handling GetAllAttendeesQuery
+2025-05-08 15:41:09 [Information] Retrieved 3 attendees
+2025-05-08 15:41:14 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:41:14 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:41:14 [Information] Retrieved 4 tickets
+2025-05-08 15:48:55 [Information] Application starting up
+2025-05-08 15:48:55 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 15:49:04 [Error] An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: Missing SENDGRID_API_KEY
+   at Infrastructure.Services.SendGridEmailService..ctor(IConfiguration config) in C:\Users\joudy\Desktop\hw4_\HW4_JoudySabbagh\Infrastructure\Services\SendGridEmailService.cs:line 18
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitConstructor(ConstructorCallSite constructorCallSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSiteMain(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitCache(ServiceCallSite callSite, RuntimeResolverContext context, ServiceProviderEngineScope serviceProviderEngine, RuntimeResolverLock lockType)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitScopeCache(ServiceCallSite callSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.Resolve(ServiceCallSite callSite, ServiceProviderEngineScope scope)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.DynamicServiceProviderEngine.<>c__DisplayClass2_0.<RealizeService>b__0(ServiceProviderEngineScope scope)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope.GetService(Type serviceType)
+   at lambda_method8(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Localization.RequestLocalizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-05-08 15:49:43 [Information] Fetching all events
+2025-05-08 15:49:43 [Information] Handling GetAllEventsQuery
+2025-05-08 15:49:45 [Information] Fetching all attendees
+2025-05-08 15:49:45 [Information] Handling GetAllAttendeesQuery
+2025-05-08 15:49:45 [Information] Retrieved 3 attendees
+2025-05-08 15:49:45 [Information] Retrieved 2 events
+2025-05-08 15:49:47 [Information] Rendering Create Attendee form
+2025-05-08 15:49:49 [Information] Fetching all events
+2025-05-08 15:49:49 [Information] Handling GetAllEventsQuery
+2025-05-08 15:49:50 [Information] Retrieved 2 events
+2025-05-08 15:50:27 [Information] Application starting up
+2025-05-08 15:50:28 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-08 15:50:50 [Information] Fetching all attendees
+2025-05-08 15:50:51 [Information] Handling GetAllAttendeesQuery
+2025-05-08 15:50:53 [Information] Retrieved 3 attendees
+2025-05-08 15:50:56 [Information] Fetching all events
+2025-05-08 15:50:56 [Information] Handling GetAllEventsQuery
+2025-05-08 15:50:56 [Information] Retrieved 2 events
+2025-05-08 15:50:58 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:50:59 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:50:59 [Information] Retrieved 4 tickets
+2025-05-08 15:51:00 [Information] Rendering Create Ticket form
+2025-05-08 15:51:06 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 2, AttendeeId: 3, TicketType: "VIP", Price: 0 }
+2025-05-08 15:51:06 [Information] Ticket purchased with ID 7
+2025-05-08 15:51:06 [Information] Ticket purchased with ID 7
+2025-05-08 15:51:06 [Information] Ticket created with Id 7
+2025-05-08 15:51:08 [Information] Fetching tickets (sort=null, event=null, category=null)
+2025-05-08 15:51:08 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-08 15:51:08 [Information] Retrieved 5 tickets
