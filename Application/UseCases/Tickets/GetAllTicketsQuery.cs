@@ -1,11 +1,11 @@
-// Application/UseCases/Tickets/GetAllTicketsQuery.cs
 using System.Collections.Generic;
+using Application.Common;            
 using Application.DTOs;
 using MediatR;
 
 namespace Application.UseCases.Tickets
 {
-    public class GetAllTicketsQuery : IRequest<List<TicketListDTO>>
+    public class GetAllTicketsQuery : IRequest<Result<List<TicketListDTO>>>
     {
         public string SortOrder { get; }
         public int? EventFilter { get; }

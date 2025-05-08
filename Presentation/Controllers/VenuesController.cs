@@ -1,6 +1,7 @@
-// Presentation/Controllers/VenuesController.cs
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Common;            
 using Application.DTOs;
 using Application.UseCases.Venues;
 using Application.Validators;
@@ -25,9 +26,16 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation("Fetching all venues");
-            var list = await _mediator.Send(new GetAllVenuesQuery());
-            _logger.LogInformation("Retrieved {Count} venues", list.Count);
-            return View(list);
+            var result = await _mediator.Send(new GetAllVenuesQuery());
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch venues: {Error}", result.Error);
+                ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                return View(Enumerable.Empty<VenueListDTO>());
+            }
+
+            return View(result.Value);
         }
 
         // GET: Venues/Create
@@ -43,11 +51,12 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Received CreateVenue request for {@Dto}", dto);
 
-            var result = new CreateVenueValidator().Validate(dto);
-            if (!result.IsValid)
+            var validation = new CreateVenueValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("CreateVenueDTO validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(e => ModelState.AddModelError(string.Empty, e.ErrorMessage));
+                _logger.LogWarning("CreateVenueDTO validation failed: {@Errors}", validation.Errors);
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
 
@@ -60,9 +69,14 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Venue {Id}", id);
+            var result = await _mediator.Send(new GetAllVenuesQuery());
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to fetch venues for edit: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
+            }
 
-            var item = (await _mediator.Send(new GetAllVenuesQuery()))
-                       .FirstOrDefault(v => v.Id == id);
+            var item = result.Value.FirstOrDefault(v => v.Id == id);
             if (item == null)
             {
                 _logger.LogWarning("Venue {Id} not found for edit", id);
@@ -85,16 +99,14 @@ namespace Presentation.Controllers
             _logger.LogInformation("Received UpdateVenue request for {Id}: {@Dto}", id, dto);
 
             if (id != dto.Id)
-            {
-                _logger.LogWarning("Route id {RouteId} does not match DTO id {DtoId}", id, dto.Id);
                 return NotFound();
-            }
 
-            var result = new UpdateVenueValidator().Validate(dto);
-            if (!result.IsValid)
+            var validation = new UpdateVenueValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("UpdateVenueDTO validation failed: {@Errors}", result.Errors);
-                result.Errors.ToList().ForEach(e => ModelState.AddModelError(string.Empty, e.ErrorMessage));
+                _logger.LogWarning("UpdateVenueDTO validation failed: {@Errors}", validation.Errors);
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
                 return View(dto);
             }
 
@@ -107,14 +119,16 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Venue {Id}", id);
-
-            var item = (await _mediator.Send(new GetAllVenuesQuery()))
-                       .FirstOrDefault(v => v.Id == id);
-            if (item == null)
+            var result = await _mediator.Send(new GetAllVenuesQuery());
+            if (!result.IsSuccess)
             {
-                _logger.LogWarning("Venue {Id} not found for deletion", id);
-                return NotFound();
+                _logger.LogWarning("Failed to fetch venues for deletion: {Error}", result.Error);
+                return RedirectToAction(nameof(Index));
             }
+
+            var item = result.Value.FirstOrDefault(v => v.Id == id);
+            if (item == null)
+                return NotFound();
 
             return View(item);
         }
