@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,13 +36,13 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateAttendeeHandler).Assembly)
 );
-
 // 6. EF Core
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // 7. DI
+builder.Services.AddScoped<ITicketPricingService, TicketPricingService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
