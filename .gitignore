@@ -3,6 +3,4 @@ obj/
 .vs/
 .github
 
-app.db
-
 .env
