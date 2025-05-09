@@ -1,4 +1,3 @@
-// Application/Mapping/MappingProfile.cs
 using AutoMapper;
 using Domain.Entities;
 using Domain.ValueObjects;

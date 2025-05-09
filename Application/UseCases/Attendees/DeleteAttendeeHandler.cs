@@ -1,4 +1,3 @@
-// Application/UseCases/Attendees/DeleteAttendeeHandler.cs
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Domain.Interfaces;

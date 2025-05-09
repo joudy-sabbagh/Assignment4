@@ -1,4 +1,3 @@
-// Application/Validators/LoginRequestValidator.cs
 using Application.DTOs;
 using FluentValidation;
 

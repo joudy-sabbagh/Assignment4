@@ -1,4 +1,3 @@
-// Application/DTOs/CreateTicketDTO.cs
 namespace Application.DTOs
 {
     public class CreateTicketDTO

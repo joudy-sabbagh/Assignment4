@@ -1,4 +1,3 @@
-// Application/UseCases/Events/CreateEventCommand.cs
 using Application.DTOs;
 using MediatR;
 

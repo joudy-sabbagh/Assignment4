@@ -1,10 +1,9 @@
-// Application/UseCases/Events/CreateEventHandler.cs
-using MediatR;                                // IRequestHandler<,>
-using Domain.Interfaces;                      // IEventRepository
-using Domain.Services;                        // IEventValidationService
-using Microsoft.Extensions.Logging;           // ILogger<>
-using Application.UseCases.Events;            // CreateEventCommand
-using Domain.Entities;                        // Event
+using MediatR;                                 
+using Domain.Interfaces;                       
+using Domain.Services;                         
+using Microsoft.Extensions.Logging;        
+using Application.UseCases.Events;             
+using Domain.Entities;                       
 
 namespace Application.UseCases.Events
 {
@@ -28,7 +27,6 @@ namespace Application.UseCases.Events
         {
             var dto = request.Dto;
 
-            // enforce business rules via domain service
             _validation.ValidateEventDetails(
                 dto.EventDate,
                 dto.NormalPrice,

@@ -1,4 +1,3 @@
-// Infrastructure/Data/AppDbContext.cs
 using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -13,7 +12,6 @@ namespace Infrastructure.Data
             : base(options)
         { }
 
-        // your existing entities
         public DbSet<Attendee> Attendees { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
@@ -21,18 +19,13 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // first let Identity configure its tables
             base.OnModelCreating(modelBuilder);
 
-            // then your domain model configuration
-
-            // primary keys
             modelBuilder.Entity<Attendee>().HasKey(a => a.Id);
             modelBuilder.Entity<Event>().HasKey(e => e.Id);
             modelBuilder.Entity<Ticket>().HasKey(t => t.Id);
             modelBuilder.Entity<Venue>().HasKey(v => v.Id);
 
-            // relationships
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.Venue)
                 .WithMany(v => v.Events)
@@ -48,7 +41,6 @@ namespace Infrastructure.Data
                 .WithMany(a => a.Tickets)
                 .HasForeignKey(t => t.AttendeeId);
 
-            // EmailAddress VO mapping
             modelBuilder.Entity<Attendee>()
                 .Property(a => a.Email)
                 .HasConversion(
@@ -57,7 +49,6 @@ namespace Infrastructure.Data
                 .HasColumnName("Email")
                 .IsRequired();
 
-            // Money VO mapping
             modelBuilder.Entity<Ticket>()
                 .Property(t => t.Price)
                 .HasConversion(

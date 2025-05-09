@@ -1,4 +1,3 @@
-// Application/DTOs/RegisterRequest.cs
 namespace Application.DTOs
 {
     public class RegisterRequest

@@ -1,4 +1,3 @@
-// Application/UseCases/Attendees/CreateAttendeeHandler.cs
 using AutoMapper;
 using Application.DTOs;
 using Domain.Entities;

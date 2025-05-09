@@ -1,4 +1,3 @@
-// Domain/ValueObjects/EmailAddress.cs
 using System;
 using System.Text.RegularExpressions;
 

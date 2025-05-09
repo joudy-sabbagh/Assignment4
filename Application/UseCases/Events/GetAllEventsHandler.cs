@@ -1,4 +1,3 @@
-// Application/UseCases/Events/GetAllEventsHandler.cs
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

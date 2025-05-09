@@ -1,10 +1,9 @@
-// Application/UseCases/Events/UpdateEventHandler.cs
-using MediatR;                                // IRequestHandler<,>, Unit
-using Domain.Interfaces;                      // IEventRepository
-using Domain.Services;                        // IEventValidationService
-using Microsoft.Extensions.Logging;           // ILogger<>
-using Application.UseCases.Events;            // UpdateEventCommand
-using Domain.Entities;                        // Event
+using MediatR;                             
+using Domain.Interfaces;                    
+using Domain.Services;                       
+using Microsoft.Extensions.Logging;           
+using Application.UseCases.Events;         
+using Domain.Entities;                        
 
 namespace Application.UseCases.Events
 {
@@ -36,7 +35,6 @@ namespace Application.UseCases.Events
                 throw new KeyNotFoundException($"Event {dto.Id} not found.");
             }
 
-            // enforce business rules before updating
             _validation.ValidateEventDetails(
                 dto.EventDate,
                 dto.NormalPrice,

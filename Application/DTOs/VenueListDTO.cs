@@ -1,4 +1,3 @@
-// Application/DTOs/VenueListDTO.cs
 namespace Application.DTOs
 {
     public class VenueListDTO

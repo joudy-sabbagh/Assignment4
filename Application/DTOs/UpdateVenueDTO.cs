@@ -1,4 +1,3 @@
-// Application/DTOs/UpdateVenueDTO.cs
 namespace Application.DTOs
 {
     public class UpdateVenueDTO

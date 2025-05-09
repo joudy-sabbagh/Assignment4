@@ -1,4 +1,3 @@
-// File: Application/Common/Result.cs
 namespace Application.Common
 {
     public class Result<T>

@@ -1,4 +1,3 @@
-// Application/UseCases/Venues/UpdateVenueHandler.cs
 using Application.DTOs;
 using Domain.Interfaces;
 using MediatR;

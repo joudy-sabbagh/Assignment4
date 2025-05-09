@@ -1,7 +1,6 @@
-// Domain/Entities/Attendee.cs
 using System;
 using System.Collections.Generic;
-using Domain.ValueObjects;  // for EmailAddress
+using Domain.ValueObjects;  
 
 namespace Domain.Entities
 {
@@ -11,8 +10,6 @@ namespace Domain.Entities
         public string Name { get; private set; }
         public EmailAddress Email { get; private set; }
         public ICollection<Ticket> Tickets { get; private set; } = new List<Ticket>();
-
-        // EF Core
         private Attendee() { }
 
         public Attendee(string name, EmailAddress email)

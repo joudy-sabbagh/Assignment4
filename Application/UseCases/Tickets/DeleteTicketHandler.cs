@@ -1,4 +1,3 @@
-// Application/UseCases/Tickets/DeleteTicketHandler.cs
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;

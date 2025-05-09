@@ -1,4 +1,3 @@
-// File: Application/DTOs/LoginRequest.cs
 namespace Application.DTOs
 {
     public class LoginRequest

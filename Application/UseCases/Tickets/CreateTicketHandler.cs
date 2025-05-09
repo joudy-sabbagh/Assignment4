@@ -1,4 +1,3 @@
-// Application/UseCases/Tickets/CreateTicketHandler.cs
 using MediatR;
 using Domain.Entities;
 using Domain.Events;
@@ -27,16 +26,13 @@ namespace Application.UseCases.Tickets
         {
             var dto = request.Dto;
 
-            // 1) fetch the event
             var ev = await _eventRepo.GetByIdAsync(dto.EventId)
                       ?? throw new ArgumentException("Event not found", nameof(dto.EventId));
 
-            // 2) parse the ticket-type enum
             var category = Enum.TryParse<TicketCategory>(dto.TicketType, true, out var c)
                            ? c
                            : throw new ArgumentException("Unknown ticket type", nameof(dto.TicketType));
 
-            // 3) pick the right price from the event
             decimal priceToCharge = category switch
             {
                 TicketCategory.Normal => ev.NormalPrice,
@@ -45,9 +41,8 @@ namespace Application.UseCases.Tickets
                 _ => throw new ArgumentOutOfRangeException(nameof(category))
             };
 
-            // 4) create & save the ticket with the event’s stored price
             var ticket = new Ticket(
-                dto.TicketType,        // string name
+                dto.TicketType,    
                 new Money(priceToCharge),
                 category,
                 dto.EventId,

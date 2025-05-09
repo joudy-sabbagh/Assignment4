@@ -1,4 +1,3 @@
-// Application/UseCases/Events/GetAllEventsQuery.cs
 using System.Collections.Generic;
 using Application.Common;
 using Application.DTOs;

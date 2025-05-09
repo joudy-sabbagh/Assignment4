@@ -1,4 +1,3 @@
-// Presentation/Program.cs
 using System;
 using System.Globalization;
 using System.Text;

@@ -1,6 +1,5 @@
-// Domain/Entities/Ticket.cs
 using System;
-using Domain.ValueObjects;  // for Money
+using Domain.ValueObjects;  
 
 namespace Domain.Entities
 {
@@ -15,7 +14,6 @@ namespace Domain.Entities
         public int AttendeeId { get; private set; }
         public Attendee Attendee { get; private set; } = null!;
 
-        // EF Core
         private Ticket() { }
 
         public Ticket(

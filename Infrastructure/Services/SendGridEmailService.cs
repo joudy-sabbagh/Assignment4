@@ -14,11 +14,9 @@ namespace Infrastructure.Services
 
         public SendGridEmailService(IConfiguration config)
         {
-            // for quick testing only—hard-code your key here
             _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY")
                     ?? throw new InvalidOperationException("Missing SENDGRID_API_KEY");
 
-            // you can also hard-code the from address, or still pull from config
             var fromEmail = config["SendGrid:FromEmail"]
                             ?? "jfs18@mail.aub.edu";
             var fromName = config["SendGrid:FromName"]

@@ -1,4 +1,3 @@
-// Application/UseCases/Tickets/UpdateTicketHandler.cs
 using MediatR;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -27,21 +26,18 @@ namespace Application.UseCases.Tickets
             var ev = await _eventRepo.GetByIdAsync(dto.EventId)
                      ?? throw new KeyNotFoundException();
 
-               // 1) parse the category
             var category = Enum.TryParse<TicketCategory>(dto.TicketType, true, out var c)
                                ? c
                                : throw new ArgumentException("Unknown ticket type", nameof(dto.TicketType));
            
-                           // 2) pick the price from the event
-                       decimal priceToCharge = category switch
-                           {
-            TicketCategory.Normal    => ev.NormalPrice,
-            TicketCategory.VIP       => ev.VIPPrice,
-            TicketCategory.Backstage => ev.BackstagePrice,
-            _                        => throw new ArgumentOutOfRangeException(nameof(category))
-                };
+            decimal priceToCharge = category switch
+            {
+                TicketCategory.Normal    => ev.NormalPrice,
+                TicketCategory.VIP       => ev.VIPPrice,
+                TicketCategory.Backstage => ev.BackstagePrice,
+                _                        => throw new ArgumentOutOfRangeException(nameof(category))
+            };
 
-                // 3) update using the event’s stored price
                 ticket.UpdateTypeAndPrice(
                     dto.TicketType,
                     new Money(priceToCharge),

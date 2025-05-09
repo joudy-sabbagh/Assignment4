@@ -1,4 +1,3 @@
-// Application/UseCases/Attendees/UpdateAttendeeHandler.cs
 using System;
 using System.Collections.Generic;
 using System.Threading;

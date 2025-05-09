@@ -1,4 +1,3 @@
-// Application/DTOs/UpdateEventDTO.cs
 using System;
 
 namespace Application.DTOs

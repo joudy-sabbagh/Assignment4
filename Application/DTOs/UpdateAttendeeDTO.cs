@@ -1,4 +1,3 @@
-// Application/DTOs/UpdateAttendeeDTO.cs
 namespace Application.DTOs
 {
     public class UpdateAttendeeDTO

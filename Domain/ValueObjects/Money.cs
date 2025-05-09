@@ -1,4 +1,3 @@
-// Domain/ValueObjects/Money.cs
 using System;
 
 namespace Domain.ValueObjects

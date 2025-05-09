@@ -1,4 +1,3 @@
-// Presentation/Controllers/AttendeesController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;

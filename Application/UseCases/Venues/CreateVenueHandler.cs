@@ -1,4 +1,3 @@
-// Application/UseCases/Venues/CreateVenueHandler.cs
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;

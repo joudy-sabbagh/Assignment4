@@ -1,4 +1,3 @@
-// Application/DTOs/UpdateTicketDTO.cs
 namespace Application.DTOs
 {
     public class UpdateTicketDTO

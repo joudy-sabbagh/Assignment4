@@ -15,7 +15,6 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <form asp-action="Create" method="post">
-    <!-- Ticket Type -->
     <div class="form-group">
         <label asp-for="TicketType"></label>
         <select asp-for="TicketType" class="form-control">
@@ -27,7 +26,6 @@
         <span asp-validation-for="TicketType" class="text-danger"></span>
     </div>
 
-    <!-- Event -->
     <div class="form-group">
         <label asp-for="EventId">Event</label>
         <select asp-for="EventId" class="form-control">
@@ -39,7 +37,6 @@
         <span asp-validation-for="EventId" class="text-danger"></span>
     </div>
 
-    <!-- Attendee -->
     <div class="form-group">
         <label asp-for="AttendeeId">Attendee</label>
         <select asp-for="AttendeeId" class="form-control">

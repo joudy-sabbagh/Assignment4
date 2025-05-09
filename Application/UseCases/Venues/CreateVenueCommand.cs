@@ -1,4 +1,3 @@
-// Application/UseCases/Venues/CreateVenueCommand.cs
 using Application.DTOs;
 using MediatR;
 

@@ -1,4 +1,3 @@
-// Application/DTOs/AttendeeListDTO.cs
 namespace Application.DTOs
 {
 	public class AttendeeListDTO

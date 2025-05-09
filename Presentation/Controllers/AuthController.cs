@@ -1,4 +1,3 @@
-// Presentation/Controllers/AuthController.cs
 using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;

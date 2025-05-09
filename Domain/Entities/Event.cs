@@ -1,4 +1,3 @@
-// Domain/Entities/Event.cs
 using System;
 using System.Collections.Generic;
 
@@ -16,10 +15,8 @@ namespace Domain.Entities
         public Venue Venue { get; private set; } = null!;
         public ICollection<Ticket> Tickets { get; private set; } = new List<Ticket>();
 
-        // EF Core
         private Event() { }
 
-        // Creation with guards
         public Event(
             string name,
             DateTime eventDate,
@@ -45,7 +42,6 @@ namespace Domain.Entities
             VenueId = venueId;
         }
 
-        // Mutation with the same guards
         public void UpdateDetails(
             string name,
             DateTime eventDate,

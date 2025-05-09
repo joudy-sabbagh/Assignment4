@@ -1,4 +1,3 @@
-// Application/UseCases/Attendees/GetAllAttendeesQuery.cs
 using System.Collections.Generic;
 using Application.Common;            
 using Application.DTOs;
