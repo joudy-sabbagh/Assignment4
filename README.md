@@ -41,7 +41,7 @@ dotnet ef database update
 From the root folder run:
 
 ```bash
-dotnet run --project Presentation
+dotnet run 
 ```
 
 The server will start at:
