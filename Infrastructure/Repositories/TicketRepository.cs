@@ -16,17 +16,12 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Ticket>> GetAllWithEventAndAttendeeAsync()
-        {
-            return await _context.Tickets
-                                 .Include(t => t.Event)
-                                 .Include(t => t.Attendee)
-                                 .ToListAsync();
-        }
-
         public async Task<IEnumerable<Ticket>> GetAllAsync()
         {
-            return await _context.Tickets.ToListAsync();
+            return await _context.Tickets
+                .Include(t => t.Event)
+                .Include(t => t.Attendee)
+                .ToListAsync();
         }
 
         public async Task<Ticket?> GetByIdAsync(int id)

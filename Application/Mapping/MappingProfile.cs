@@ -41,7 +41,12 @@ namespace Application.Mapping
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()))
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
-                .ForMember(dest => dest.AttendeeId, opt => opt.MapFrom(src => src.AttendeeId));
+                .ForMember(dest => dest.AttendeeId, opt => opt.MapFrom(src => src.AttendeeId))
+                .ForMember(dest => dest.EventName,
+                           opt => opt.MapFrom(src => src.Event.Name))
+                .ForMember(dest => dest.AttendeeName,
+                           opt => opt.MapFrom(src => src.Attendee.Name));
+
         }
     }
 }

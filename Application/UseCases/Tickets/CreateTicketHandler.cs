@@ -26,16 +26,29 @@ namespace Application.UseCases.Tickets
         public async Task<int> Handle(CreateTicketCommand request, CancellationToken ct)
         {
             var dto = request.Dto;
-            var ev = await _eventRepo.GetByIdAsync(dto.EventId)
-                      ?? throw new KeyNotFoundException();
 
+            // 1) fetch the event
+            var ev = await _eventRepo.GetByIdAsync(dto.EventId)
+                      ?? throw new ArgumentException("Event not found", nameof(dto.EventId));
+
+            // 2) parse the ticket-type enum
             var category = Enum.TryParse<TicketCategory>(dto.TicketType, true, out var c)
                            ? c
-                           : TicketCategory.Normal;
+                           : throw new ArgumentException("Unknown ticket type", nameof(dto.TicketType));
 
+            // 3) pick the right price from the event
+            decimal priceToCharge = category switch
+            {
+                TicketCategory.Normal => ev.NormalPrice,
+                TicketCategory.VIP => ev.VIPPrice,
+                TicketCategory.Backstage => ev.BackstagePrice,
+                _ => throw new ArgumentOutOfRangeException(nameof(category))
+            };
+
+            // 4) create & save the ticket with the event’s stored price
             var ticket = new Ticket(
-                dto.TicketType,
-                new Money(dto.Price),
+                dto.TicketType,        // string name
+                new Money(priceToCharge),
                 category,
                 dto.EventId,
                 dto.AttendeeId

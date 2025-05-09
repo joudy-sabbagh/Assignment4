@@ -217,8 +217,7 @@ Event Manager Team
                 Id = item.Id,
                 EventId = item.EventId,
                 AttendeeId = item.AttendeeId,
-                TicketType = item.Category,
-                Price = item.Price
+                TicketType = item.Category
             });
         }
 

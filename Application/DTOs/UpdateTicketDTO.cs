@@ -7,6 +7,5 @@ namespace Application.DTOs
         public required int EventId { get; init; }
         public required int AttendeeId { get; init; }
         public required string TicketType { get; init; }
-        public required decimal Price { get; init; }
     }
 }

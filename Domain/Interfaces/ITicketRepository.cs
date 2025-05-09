@@ -6,7 +6,6 @@ namespace Domain.Interfaces
 {
     public interface ITicketRepository
     {
-        Task<IEnumerable<Ticket>> GetAllWithEventAndAttendeeAsync();
         Task<IEnumerable<Ticket>> GetAllAsync();
         Task<Ticket?> GetByIdAsync(int id);
         Task AddAsync(Ticket ticket);
