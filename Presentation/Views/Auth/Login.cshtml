@@ -1,0 +1,22 @@
+<!-- Presentation/Views/Auth/Login.cshtml -->
+@model Application.DTOs.LoginRequest
+@{
+    ViewData["Title"] = "Log in";
+}
+<h2>Log in</h2>
+<form asp-action="Login" method="post">
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" />
+    </div>
+    <div>
+        <input asp-for="RememberMe" type="checkbox" />
+        <label asp-for="RememberMe">Remember me</label>
+    </div>
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+    <button type="submit">Log in</button>
+</form>
