@@ -1,38 +1,73 @@
-# Event Manager System
+# Event Manager System – Assignment 4
 
-## Overview
-The **Event Manager System** is an ASP.NET Core MVC application designed to help event managers organize venues, manage events, and track ticket assignments efficiently. This version is focused on the **admin/event manager side**, allowing CRUD operations for venues, events, attendees, and ticket assignments. Future updates will include attendee registration and ticket purchases.
+This project implements a Clean Architecture Event Manager System using ASP.NET Core MVC, Entity Framework Core, and SQLite.
 
-## Features
-### 1. Event Management
-- Create, update, and delete events.
-- Assign events to existing venues.
-- Define tier-based pricing for tickets (Normal, VIP, Backstage).
+## Prerequisites
 
-### 2. Attendee and Ticket Management
-- Add attendees manually for testing purposes.
-- Assign tickets to attendees with tier selection.
-- View which attendee has which ticket and for which event.
+* .NET SDK 7.0 or later
+* Visual Studio 2022 or VS Code with C# extension
+* Git
+* (Optional) DB Browser for SQLite
 
-### 3. Sorting, Searching, and Filtering
-- **Sorting**: Tickets can be sorted by **price** (ascending/descending).
-- **Searching**: Events can be searched by **name** (case-insensitive).
-- **Filtering**: Tickets can be filtered by **event** and **ticket tier**.
+## Setup
 
-## User Stories
-### Event Management
-- **As an event manager**, I want to create new events with details (name, date, prices, venue) so that I can manage upcoming events.
-- **As an event manager**, I want to update or delete events so that I can modify schedules or cancel events.
-- **As an event manager**, I want to assign ticket tiers to events to differentiate between different levels of access.
-- **As an event manager**, I want to view all available venues before creating an event so that I can select the correct location.
-- **As an event manager**, I want to be able to manually add attendees to an event so that I can track ticket assignments for testing.
+### Clone the repository
 
-### Attendee and Ticket Management
-- **As an admin**, I want to manually add attendees to events so that ticket sales can be tested.
-- **As an admin**, I want to assign tickets to attendees based on tier selection.
-- **As an admin**, I want to track which attendee has which ticket and for which event.
-- **As an admin**, I want to filter tickets by event and tier so that I can quickly find relevant information.
-- **As an admin**, I want an organized list of attendees, their tickets, and their assigned event so that I can manage them efficiently.
+```bash
+git clone https://github.com/joudy-sabbagh/Assignment4.git
+cd Assignment4
+```
 
----
-This repository serves as the first phase of a full-scale **Event Management System**, focusing on **CRUD operations** and event organization. More features will be added in future updates.
+### Restore dependencies
+
+```bash
+dotnet restore
+```
+
+## Database Configuration
+
+The application uses SQLite. The database file `app.db` is located in the Presentation folder.
+
+### Apply migrations
+
+```bash
+cd Presentation
+dotnet tool install --global dotnet-ef    # if needed
+dotnet ef database update
+```
+
+## Run the application
+
+From the root folder run:
+
+```bash
+dotnet run --project Presentation
+```
+
+The server will start at:
+
+```
+https://localhost:5085
+http://localhost:7106
+```
+
+Open one of these URLs in your browser.
+
+## Application Usage
+
+### Register as a regular user
+
+1. Click **Register** in the navigation bar.
+2. Fill out the form and submit.
+3. You will have a user account with regular permissions.
+
+### Admin login
+
+Use the preconfigured admin account:
+
+```
+Email: joudy.f.sabbagh@gmail.com
+Password: Admin123!
+```
+
+After logging in as admin you can create, edit, or delete Events, Venues, Attendees, and Tickets.
