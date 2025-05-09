@@ -1,0 +1,18 @@
+@model Presentation.Models.ErrorViewModel
+@{
+  Layout = "_Layout";
+  var code = Model.StatusCode;
+}
+<div class="text-center mt-5">
+    <h1>@(code == 404 ? "Page Not Found" : "Something Went Wrong")</h1>
+    <p>
+        @(code == 404
+        ? "Sorry, we couldn’t find that page."
+        : "An unexpected error occurred. Please try again later.")
+    </p>
+    @if (Model.ShowRequestId)
+  {
+    <p><small>Request ID: @Model.RequestId</small></p>
+  }
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>

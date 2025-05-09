@@ -59,39 +59,30 @@ builder.Services.AddScoped<IAttendeeRepository, AttendeeRepository>();
 
 var app = builder.Build();
 
-// 8. Localization
-app.UseRequestLocalization(new RequestLocalizationOptions
+// In dev, show the detailed page; otherwise use our “/Error” handler
+if (app.Environment.IsDevelopment())
 {
-    DefaultRequestCulture = new RequestCulture(enCulture),
-    SupportedCultures = new[] { enCulture },
-    SupportedUICultures = new[] { enCulture }
-});
-
-// 9. Middleware
-if (!app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+}
+else
 {
-    app.UseExceptionHandler("/Home/Error");
+    // any exception goes to /Error
+    app.UseExceptionHandler("/Error");
+    // HSTS in production
     app.UseHsts();
 }
+
+// Turn 404/403/etc into our ErrorController too
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
+// The rest of your pipeline
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-// 10. Endpoints
-app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 11. Run
-try
-{
-    Log.Information("Application starting up");
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+app.Run();
