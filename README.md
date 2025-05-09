@@ -2,13 +2,6 @@
 
 This project implements a Clean Architecture Event Manager System using ASP.NET Core MVC, Entity Framework Core, and SQLite.
 
-## Prerequisites
-
-* .NET SDK 7.0 or later
-* Visual Studio 2022 or VS Code with C# extension
-* Git
-* (Optional) DB Browser for SQLite
-
 ## Setup
 
 ### Clone the repository
