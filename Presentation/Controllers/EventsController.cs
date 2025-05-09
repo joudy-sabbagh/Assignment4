@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Application.Common;
 using Application.DTOs;
 using Application.UseCases.Events;
@@ -8,6 +9,7 @@ using Application.Validators;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Presentation.Models;
 
@@ -15,34 +17,46 @@ namespace Presentation.Controllers
 {
     public class EventsController : Controller
     {
+        private const string CacheKey = "AllEvents";
+
         private readonly IMediator _mediator;
         private readonly IVenueRepository _venueRepo;
         private readonly ILogger<EventsController> _logger;
+        private readonly IMemoryCache _cache;
 
         public EventsController(
             IMediator mediator,
             IVenueRepository venueRepo,
-            ILogger<EventsController> logger)
+            ILogger<EventsController> logger,
+            IMemoryCache cache)
         {
             _mediator = mediator;
             _venueRepo = venueRepo;
             _logger = logger;
+            _cache = cache;
         }
 
         // GET: Events
         public async Task<IActionResult> Index(string searchString, int page = 1)
         {
-            _logger.LogInformation("Fetching all events");
-            var result = await _mediator.Send(new GetAllEventsQuery());
+            _logger.LogInformation("Fetching all events (with cache)");
 
-            if (!result.IsSuccess)
+            // Try to get the full list from cache
+            if (!_cache.TryGetValue(CacheKey, out List<EventListDTO> list))
             {
-                _logger.LogWarning("Failed to fetch events: {Error}", result.Error);
-                ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-                return View(new PagedListViewModel<EventListDTO>());
+                var result = await _mediator.Send(new GetAllEventsQuery());
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to fetch events: {Error}", result.Error);
+                    ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                    return View(new PagedListViewModel<EventListDTO>());
+                }
+
+                list = result.Value!.ToList();
+                _cache.Set(CacheKey, list, TimeSpan.FromMinutes(5));
             }
 
-            var list = result.Value!;
+            // Apply filter if needed
             if (!string.IsNullOrEmpty(searchString))
             {
                 _logger.LogInformation("Filtering events by '{Filter}'", searchString);
@@ -52,6 +66,7 @@ namespace Presentation.Controllers
                 _logger.LogInformation("{Count} events match filter", list.Count);
             }
 
+            // Paging
             const int PageSize = 20;
             var totalCount = list.Count;
             var items = list
@@ -69,6 +84,7 @@ namespace Presentation.Controllers
 
             ViewData["Venues"] = await _venueRepo.GetAllAsync();
             ViewData["SearchString"] = searchString;
+
             return View(vm);
         }
 
@@ -99,6 +115,10 @@ namespace Presentation.Controllers
 
             var id = await _mediator.Send(new CreateEventCommand(dto));
             _logger.LogInformation("Event created with Id {EventId}", id);
+
+            // invalidate cache so new event shows up
+            _cache.Remove(CacheKey);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -107,7 +127,6 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Rendering Edit form for Event {Id}", id);
             var result = await _mediator.Send(new GetAllEventsQuery());
-
             if (!result.IsSuccess)
             {
                 _logger.LogWarning("Failed to fetch events for edit: {Error}", result.Error);
@@ -159,6 +178,10 @@ namespace Presentation.Controllers
 
             await _mediator.Send(new UpdateEventCommand(dto));
             _logger.LogInformation("Event {Id} updated successfully", id);
+
+            // invalidate cache so edits reflect
+            _cache.Remove(CacheKey);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -167,7 +190,6 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Rendering Delete confirmation for Event {Id}", id);
             var result = await _mediator.Send(new GetAllEventsQuery());
-
             if (!result.IsSuccess)
             {
                 _logger.LogWarning("Failed to fetch events for deletion: {Error}", result.Error);
@@ -191,6 +213,10 @@ namespace Presentation.Controllers
             _logger.LogInformation("Deleting event {Id}", id);
             await _mediator.Send(new DeleteEventCommand(id));
             _logger.LogInformation("Event {Id} deleted", id);
+
+            // invalidate cache so deletion reflects
+            _cache.Remove(CacheKey);
+
             return RedirectToAction(nameof(Index));
         }
     }

@@ -6,10 +6,11 @@ using Application.Common;
 using Application.DTOs;
 using Application.UseCases.Tickets;
 using Application.Validators;
-using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Application.Interfaces;
 using Presentation.Models;
@@ -18,24 +19,29 @@ namespace Presentation.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly IEmailService _emailService;
+        private const string CacheKey = "AllTickets";
+
         private readonly IMediator _mediator;
         private readonly IEventRepository _eventRepo;
         private readonly IAttendeeRepository _attendeeRepo;
+        private readonly IEmailService _emailService;
         private readonly ILogger<TicketsController> _logger;
+        private readonly IMemoryCache _cache;
 
         public TicketsController(
             IMediator mediator,
             IEventRepository eventRepo,
             IAttendeeRepository attendeeRepo,
             ILogger<TicketsController> logger,
-            IEmailService emailService)
+            IEmailService emailService,
+            IMemoryCache cache)
         {
             _mediator = mediator;
             _eventRepo = eventRepo;
             _attendeeRepo = attendeeRepo;
             _logger = logger;
             _emailService = emailService;
+            _cache = cache;
         }
 
         // GET: Tickets
@@ -51,37 +57,58 @@ namespace Presentation.Controllers
 
             ViewData["Events"] = await _eventRepo.GetAllAsync();
             ViewData["CategoryList"] = Enum.GetValues(typeof(TicketCategory))
-                                               .Cast<TicketCategory>();
+                                           .Cast<TicketCategory>();
             ViewData["CurrentSort"] = sortOrder;
             ViewData["SelectedEvent"] = eventFilter;
             ViewData["SelectedCategory"] = categoryFilter;
 
-            var result = await _mediator.Send(
-                new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
-            );
+            // Decide whether to use cache (only for the unfiltered, default view)
+            bool useCache = string.IsNullOrEmpty(sortOrder)
+                            && eventFilter == null
+                            && string.IsNullOrEmpty(categoryFilter);
 
-            if (!result.IsSuccess)
+            List<TicketListDTO> all;
+            if (useCache)
             {
-                _logger.LogWarning("Failed to fetch tickets: {Error}", result.Error);
-                ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-
-                var emptyVm = new PagedListViewModel<TicketListDTO>
+                if (!_cache.TryGetValue(CacheKey, out all))
                 {
-                    Items = Enumerable.Empty<TicketListDTO>(),
-                    PageNumber = page,
-                    PageSize = 20,
-                    TotalCount = 0
-                };
-                return View(emptyVm);
+                    var result = await _mediator.Send(
+                        new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
+                    );
+
+                    if (!result.IsSuccess)
+                    {
+                        _logger.LogWarning("Failed to fetch tickets: {Error}", result.Error);
+                        ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                        return View(new PagedListViewModel<TicketListDTO>());
+                    }
+
+                    all = result.Value!.ToList();
+                    _cache.Set(CacheKey, all, TimeSpan.FromMinutes(5));
+                }
+            }
+            else
+            {
+                var result = await _mediator.Send(
+                    new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
+                );
+
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to fetch tickets: {Error}", result.Error);
+                    ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
+                    return View(new PagedListViewModel<TicketListDTO>());
+                }
+
+                all = result.Value!.ToList();
             }
 
-            var all = result.Value!;
             const int PageSize = 20;
-            var totalCount = all.Count();
+            var totalCount = all.Count;
             var items = all
-                                .Skip((page - 1) * PageSize)
-                                .Take(PageSize)
-                                .ToList();
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
 
             var vm = new PagedListViewModel<TicketListDTO>
             {
@@ -111,14 +138,12 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Received CreateTicket request for {@Dto}", dto);
 
-            var validationResult = new CreateTicketValidator().Validate(dto);
-            if (!validationResult.IsValid)
+            var validation = new CreateTicketValidator().Validate(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning(
-                    "CreateTicketDTO validation failed: {@Errors}",
-                    validationResult.Errors);
-                foreach (var error in validationResult.Errors)
-                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                _logger.LogWarning("Validation failed: {@Errors}", validation.Errors);
+                foreach (var err in validation.Errors)
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
 
                 ViewData["Events"] = await _eventRepo.GetAllAsync();
                 ViewData["Attendees"] = await _attendeeRepo.GetAllAsync();
@@ -130,54 +155,34 @@ namespace Presentation.Controllers
             var ticketId = await _mediator.Send(new CreateTicketCommand(dto));
             _logger.LogInformation("Ticket created with Id {TicketId}", ticketId);
 
+            // Invalidate cache so the new ticket appears immediately
+            _cache.Remove(CacheKey);
+
             var attendee = await _attendeeRepo.GetByIdAsync(dto.AttendeeId);
             var ev = await _eventRepo.GetByIdAsync(dto.EventId);
-
             if (attendee != null && ev != null)
             {
                 var name = attendee.Name;
                 var email = attendee.Email.Value;
                 var eventName = ev.Name;
-                var ticketTier = dto.TicketType.ToString();
+                var tier = dto.TicketType.ToString();
 
-                var plainTextContent = $@"
-Hello {name},
+                var textContent = $@"Hello {name},
 
 Thank you for booking with us!
 
 Event       : {eventName}
-Ticket Tier : {ticketTier}
+Ticket Tier : {tier}
 Ticket ID   : {ticketId}
-
-We look forward to seeing you there.
 
 Best regards,
 Event Manager Team
 ";
-
-                var htmlContent = $@"
-<p>Hello <strong>{name}</strong>,</p>
-<p>Thank you for booking with us! Here are your details:</p>
-<ul>
-  <li><strong>Event:</strong> {eventName}</li>
-  <li><strong>Ticket Tier:</strong> {ticketTier}</li>
-  <li><strong>Ticket ID:</strong> {ticketId}</li>
-</ul>
-<p>Best regards,<br/><strong>Event Manager Team</strong></p>
-";
-
                 await _emailService.SendEmailAsync(
                     toEmail: email,
                     subject: $"Your {eventName} Ticket Confirmation",
-                    plainTextContent: plainTextContent,
-                    htmlContent: htmlContent
-                );
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "Could not send email: attendee or event not found (Attendee={AttId}, Event={EvtId})",
-                    dto.AttendeeId, dto.EventId
+                    plainTextContent: textContent,
+                    htmlContent: null
                 );
             }
 
@@ -194,9 +199,7 @@ Event Manager Team
 
             if (!result.IsSuccess)
             {
-                _logger.LogWarning(
-                    "Failed to fetch tickets for edit: {Error}",
-                    result.Error);
+                _logger.LogWarning("Failed to fetch tickets for edit: {Error}", result.Error);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -225,9 +228,7 @@ Event Manager Team
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
-            _logger.LogInformation(
-                "Received UpdateTicket request for {Id}: {@Dto}",
-                id, dto);
+            _logger.LogInformation("Received UpdateTicket request for {Id}: {@Dto}", id, dto);
 
             if (id != dto.Id)
                 return NotFound();
@@ -247,23 +248,24 @@ Event Manager Team
 
             await _mediator.Send(new UpdateTicketCommand(dto));
             _logger.LogInformation("Ticket {Id} updated successfully", id);
+
+            // Invalidate cache so edits appear immediately
+            _cache.Remove(CacheKey);
+
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Tickets/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            _logger.LogInformation(
-                "Rendering Delete confirmation for Ticket {Id}", id);
+            _logger.LogInformation("Rendering Delete confirmation for Ticket {Id}", id);
             var result = await _mediator.Send(
                 new GetAllTicketsQuery("", null, null)
             );
 
             if (!result.IsSuccess)
             {
-                _logger.LogWarning(
-                    "Failed to fetch tickets for deletion: {Error}",
-                    result.Error);
+                _logger.LogWarning("Failed to fetch tickets for deletion: {Error}", result.Error);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -281,6 +283,10 @@ Event Manager Team
             _logger.LogInformation("Deleting Ticket {Id}", id);
             await _mediator.Send(new DeleteTicketCommand(id));
             _logger.LogInformation("Ticket {Id} deleted", id);
+
+            // Invalidate cache so deletion appears immediately
+            _cache.Remove(CacheKey);
+
             return RedirectToAction(nameof(Index));
         }
     }

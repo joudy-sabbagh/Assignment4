@@ -57,6 +57,8 @@ builder.Services.AddScoped<IVenueRepository, VenueRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<IAttendeeRepository, AttendeeRepository>();
 
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 // In dev, show the detailed page; otherwise use our “/Error” handler

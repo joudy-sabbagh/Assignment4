@@ -265,3 +265,201 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 2025-05-09 13:13:17 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
 2025-05-09 13:13:17 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
 2025-05-09 13:13:17 [Information] Retrieved 1 tickets
+2025-05-09 13:34:41 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:34:52 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:35:49 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:36:36 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:36:53 [Information] Fetching tickets (sort=null, event=null, category="Normal", page=1)
+2025-05-09 13:36:55 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category="Normal")
+2025-05-09 13:36:55 [Information] Retrieved 0 tickets
+2025-05-09 13:36:57 [Information] Fetching all venues (with cache)
+2025-05-09 13:36:57 [Information] Handling GetAllVenuesQuery
+2025-05-09 13:36:58 [Information] Retrieved 2 venues
+2025-05-09 13:36:59 [Information] Fetching all events (with cache)
+2025-05-09 13:36:59 [Information] Handling GetAllEventsQuery
+2025-05-09 13:36:59 [Information] Retrieved 3 events
+2025-05-09 13:37:00 [Information] Fetching all attendees (with cache)
+2025-05-09 13:37:00 [Information] Handling GetAllAttendeesQuery
+2025-05-09 13:37:00 [Information] Retrieved 3 attendees
+2025-05-09 13:37:01 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:37:01 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:37:01 [Information] Retrieved 1 tickets
+2025-05-09 13:37:02 [Information] Fetching all events (with cache)
+2025-05-09 13:37:23 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:37:27 [Information] Fetching tickets (sort=null, event=null, category="Normal", page=1)
+2025-05-09 13:37:29 [Information] Fetching tickets (sort=null, event=null, category="Normal", page=1)
+2025-05-09 13:37:41 [Information] Fetching all attendees (with cache)
+2025-05-09 13:37:44 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:37:46 [Information] Rendering Create Ticket form
+2025-05-09 13:37:49 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 3, TicketType: "Normal" }
+2025-05-09 13:37:50 [Information] Ticket purchased with ID 14
+2025-05-09 13:37:50 [Information] Ticket purchased with ID 14
+2025-05-09 13:37:50 [Information] Ticket created with Id 14
+2025-05-09 13:37:52 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:38:03 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:38:08 [Information] Rendering Create Ticket form
+2025-05-09 13:38:11 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 3, TicketType: "Normal" }
+2025-05-09 13:38:11 [Information] Ticket purchased with ID 15
+2025-05-09 13:38:11 [Information] Ticket purchased with ID 15
+2025-05-09 13:38:11 [Information] Ticket created with Id 15
+2025-05-09 13:38:11 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:38:17 [Information] Fetching all attendees (with cache)
+2025-05-09 13:38:18 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:38:19 [Information] Fetching all attendees (with cache)
+2025-05-09 13:38:20 [Information] Rendering Create Attendee form
+2025-05-09 13:38:29 [Information] Received Create request for CreateAttendeeDTO { Name: "Lynn el Shami", Email: "joudy.f.sabbagh@gmail.com" }
+2025-05-09 13:38:29 [Information] Starting CreateAttendee for CreateAttendeeDTO { Name: "Lynn el Shami", Email: "joudy.f.sabbagh@gmail.com" }
+2025-05-09 13:38:30 [Information] Created Attendee with Id 4
+2025-05-09 13:38:30 [Information] Attendee created with Id 4
+2025-05-09 13:38:30 [Information] Fetching all attendees (with cache)
+2025-05-09 13:38:30 [Information] Handling GetAllAttendeesQuery
+2025-05-09 13:38:30 [Information] Retrieved 4 attendees
+2025-05-09 13:38:33 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:38:38 [Information] Fetching tickets (sort=null, event=null, category="Normal", page=1)
+2025-05-09 13:38:39 [Information] Rendering Create Ticket form
+2025-05-09 13:38:40 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 1, TicketType: "Normal" }
+2025-05-09 13:38:40 [Information] Ticket purchased with ID 16
+2025-05-09 13:38:40 [Information] Ticket purchased with ID 16
+2025-05-09 13:38:40 [Information] Ticket created with Id 16
+2025-05-09 13:38:41 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:39:37 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:39:40 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:39:42 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:39:42 [Information] Retrieved 4 tickets
+2025-05-09 13:40:13 [Information] Fetching all events (with cache)
+2025-05-09 13:40:13 [Information] Handling GetAllEventsQuery
+2025-05-09 13:40:13 [Information] Retrieved 3 events
+2025-05-09 13:40:22 [Information] Rendering Create Event form
+2025-05-09 13:40:39 [Information] Received CreateEvent request for CreateEventDTO { Name: "New Event", EventDate: 05/24/2025 00:00:00, NormalPrice: 10, VIPPrice: 14, BackstagePrice: 20, VenueId: 1 }
+2025-05-09 13:40:39 [Information] Created Event 5
+2025-05-09 13:40:39 [Information] Event created with Id 5
+2025-05-09 13:40:39 [Information] Fetching all events (with cache)
+2025-05-09 13:40:39 [Information] Handling GetAllEventsQuery
+2025-05-09 13:40:39 [Information] Retrieved 4 events
+2025-05-09 13:40:42 [Information] Rendering Delete confirmation for Event 5
+2025-05-09 13:40:42 [Information] Handling GetAllEventsQuery
+2025-05-09 13:40:42 [Information] Retrieved 4 events
+2025-05-09 13:40:45 [Information] Deleting event 5
+2025-05-09 13:40:45 [Information] Deleting event 5
+2025-05-09 13:40:45 [Information] Deleted event 5
+2025-05-09 13:40:45 [Information] Event 5 deleted
+2025-05-09 13:40:45 [Information] Fetching all events (with cache)
+2025-05-09 13:40:45 [Information] Handling GetAllEventsQuery
+2025-05-09 13:40:45 [Information] Retrieved 3 events
+2025-05-09 13:40:49 [Information] Fetching all venues (with cache)
+2025-05-09 13:40:49 [Information] Handling GetAllVenuesQuery
+2025-05-09 13:40:49 [Information] Retrieved 2 venues
+2025-05-09 13:40:52 [Information] Rendering Create Venue form
+2025-05-09 13:40:59 [Information] Received CreateVenue request for CreateVenueDTO { Name: "Grand Convention Hall", Capacity: 89, Location: "Beirut Central District" }
+2025-05-09 13:40:59 [Information] Creating venue CreateVenueDTO { Name: "Grand Convention Hall", Capacity: 89, Location: "Beirut Central District" }
+2025-05-09 13:40:59 [Information] Created Venue with Id 3
+2025-05-09 13:40:59 [Information] Venue created with Id 3
+2025-05-09 13:40:59 [Information] Fetching all venues (with cache)
+2025-05-09 13:40:59 [Information] Handling GetAllVenuesQuery
+2025-05-09 13:40:59 [Information] Retrieved 3 venues
+2025-05-09 13:41:03 [Information] Rendering Delete confirmation for Venue 3
+2025-05-09 13:41:03 [Information] Handling GetAllVenuesQuery
+2025-05-09 13:41:03 [Information] Retrieved 3 venues
+2025-05-09 13:41:05 [Information] Deleting venue 3
+2025-05-09 13:41:05 [Information] Deleting venue 3
+2025-05-09 13:41:05 [Information] Deleted venue 3
+2025-05-09 13:41:05 [Information] Venue 3 deleted
+2025-05-09 13:41:05 [Information] Fetching all venues (with cache)
+2025-05-09 13:41:05 [Information] Handling GetAllVenuesQuery
+2025-05-09 13:41:05 [Information] Retrieved 2 venues
+2025-05-09 13:41:06 [Information] Fetching all events (with cache)
+2025-05-09 13:41:07 [Information] Fetching all attendees (with cache)
+2025-05-09 13:41:07 [Information] Handling GetAllAttendeesQuery
+2025-05-09 13:41:07 [Information] Retrieved 4 attendees
+2025-05-09 13:41:08 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:41:08 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:41:08 [Information] Retrieved 4 tickets
+2025-05-09 13:45:49 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:45:54 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:45:56 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:45:56 [Information] Retrieved 4 tickets
+2025-05-09 13:46:01 [Information] Rendering Create Ticket form
+2025-05-09 13:46:14 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 4, TicketType: "Normal" }
+2025-05-09 13:46:14 [Information] Ticket purchased with ID 17
+2025-05-09 13:46:14 [Information] Ticket purchased with ID 17
+2025-05-09 13:46:14 [Information] Ticket created with Id 17
+2025-05-09 13:46:16 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:46:48 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:46:51 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:46:53 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:46:53 [Information] Retrieved 5 tickets
+2025-05-09 13:47:27 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:47:33 [Information] Rendering Delete confirmation for Ticket 17
+2025-05-09 13:47:33 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-09 13:47:35 [Information] Retrieved 5 tickets
+2025-05-09 13:47:37 [Information] Deleting Ticket 17
+2025-05-09 13:47:37 [Information] Deleting ticket 17
+2025-05-09 13:47:37 [Information] Deleted ticket 17
+2025-05-09 13:47:37 [Information] Ticket 17 deleted
+2025-05-09 13:47:37 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:47:37 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:47:37 [Information] Retrieved 4 tickets
+2025-05-09 13:47:39 [Information] Rendering Create Ticket form
+2025-05-09 13:47:43 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 4, TicketType: "Normal" }
+2025-05-09 13:47:43 [Information] Ticket purchased with ID 18
+2025-05-09 13:47:43 [Information] Ticket purchased with ID 18
+2025-05-09 13:47:43 [Information] Ticket created with Id 18
+2025-05-09 13:47:44 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:47:44 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:47:44 [Information] Retrieved 5 tickets
+2025-05-09 13:54:09 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:54:17 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:54:20 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 13:54:20 [Information] Retrieved 5 tickets
+2025-05-09 13:54:34 [Information] Rendering Delete confirmation for Ticket 18
+2025-05-09 13:54:34 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-09 13:54:34 [Information] Retrieved 5 tickets
+2025-05-09 13:54:36 [Information] Deleting Ticket 18
+2025-05-09 13:54:36 [Information] Deleting ticket 18
+2025-05-09 13:54:36 [Information] Deleted ticket 18
+2025-05-09 13:54:36 [Information] Ticket 18 deleted
+2025-05-09 13:54:36 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:54:39 [Information] Rendering Delete confirmation for Ticket 18
+2025-05-09 13:54:39 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-09 13:54:39 [Information] Retrieved 4 tickets
+2025-05-09 13:54:41 [Information] Visited Home Page
+2025-05-09 13:54:43 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 13:59:07 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 13:59:11 [Information] Fetching all events (with cache)
+2025-05-09 13:59:11 [Information] Handling GetAllEventsQuery
+2025-05-09 13:59:13 [Information] Retrieved 3 events
+2025-05-09 13:59:16 [Information] Fetching all attendees (with cache)
+2025-05-09 13:59:16 [Information] Handling GetAllAttendeesQuery
+2025-05-09 13:59:16 [Information] Retrieved 4 attendees
+2025-05-09 13:59:18 [Information] Rendering Delete confirmation for Attendee 4
+2025-05-09 13:59:19 [Information] Deleting Attendee 4
+2025-05-09 13:59:19 [Information] Deleting attendee with Id 4
+2025-05-09 13:59:20 [Information] Deleted attendee with Id 4
+2025-05-09 13:59:20 [Information] Fetching all attendees (with cache)
+2025-05-09 13:59:20 [Information] Handling GetAllAttendeesQuery
+2025-05-09 13:59:20 [Information] Retrieved 3 attendees
+2025-05-09 14:02:14 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-09 14:02:18 [Information] Fetching all attendees (with cache)
+2025-05-09 14:02:19 [Information] Handling GetAllAttendeesQuery
+2025-05-09 14:02:20 [Information] Retrieved 3 attendees
+2025-05-09 14:02:21 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 14:02:22 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 14:02:22 [Information] Retrieved 4 tickets
+2025-05-09 14:02:24 [Information] Rendering Create Ticket form
+2025-05-09 14:02:30 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 4, AttendeeId: 2, TicketType: "Normal" }
+2025-05-09 14:02:31 [Information] Ticket purchased with ID 19
+2025-05-09 14:02:31 [Information] Ticket purchased with ID 19
+2025-05-09 14:02:31 [Information] Ticket created with Id 19
+2025-05-09 14:02:32 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 14:02:32 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 14:02:32 [Information] Retrieved 5 tickets
+2025-05-09 14:02:36 [Information] Rendering Delete confirmation for Ticket 19
+2025-05-09 14:02:36 [Information] Handling GetAllTicketsQuery (sort="", event=null, category=null)
+2025-05-09 14:02:36 [Information] Retrieved 5 tickets
+2025-05-09 14:02:37 [Information] Deleting Ticket 19
+2025-05-09 14:02:37 [Information] Deleting ticket 19
+2025-05-09 14:02:37 [Information] Deleted ticket 19
+2025-05-09 14:02:37 [Information] Ticket 19 deleted
+2025-05-09 14:02:37 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-09 14:02:37 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-09 14:02:37 [Information] Retrieved 4 tickets
