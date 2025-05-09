@@ -31,6 +31,7 @@ The application uses SQLite. The database file `app.db` is located in the Presen
 ### Apply migrations
 
 ```bash
+cd Presentation
 dotnet tool install --global dotnet-ef    # if needed
 dotnet ef database update
 ```
