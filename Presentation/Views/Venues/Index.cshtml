@@ -1,36 +1,40 @@
-@* Views/Venues/Index.cshtml *@
-@model IEnumerable<Application.DTOs.VenueListDTO>
+@using Application.DTOs
+@model Presentation.Models.PagedListViewModel<VenueListDTO>
 
     @{
     ViewData["Title"] = "Venues";
     }
 
     <h1>Venues</h1>
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
-    </p>
 
-    <table class="table">
+    <table class="table table-striped">
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Capacity</th>
-                <th></th>
-            </tr>
+            <tr><th>Name</th><th>Location</th><th></th></tr>
         </thead>
         <tbody>
-            @foreach (var v in Model)
+            @foreach (var v in Model.Items)
     {
             <tr>
                 <td>@v.Name</td>
                 <td>@v.Location</td>
-                <td>@v.Capacity</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@v.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@v.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@v.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
     }
         </tbody>
     </table>
+
+    <nav aria-label="Venue pages">
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+    {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+            </li>
+    }
+        </ul>
+    </nav>
+
+    <a asp-action="Create" class="btn btn-success">Create New Venue</a>

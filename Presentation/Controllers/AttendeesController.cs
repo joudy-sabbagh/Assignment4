@@ -1,14 +1,12 @@
-// Presentation/Controllers/AttendeesController.cs
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Application.Common;            
 using Application.DTOs;
 using Application.UseCases.Attendees;
 using Application.Validators;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Presentation.Models;
 
 namespace Presentation.Controllers
 {
@@ -24,7 +22,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Attendees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             _logger.LogInformation("Fetching all attendees");
             var result = await _mediator.Send(new GetAllAttendeesQuery());
@@ -33,11 +31,23 @@ namespace Presentation.Controllers
             {
                 _logger.LogWarning("Failed to fetch attendees: {Error}", result.Error);
                 ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-                // pass an empty list to keep the UI intact
-                return View(Enumerable.Empty<AttendeeListDTO>());
+                return View(new PagedListViewModel<AttendeeListDTO>());
             }
 
-            return View(result.Value);
+            var all = result.Value;
+            const int PageSize = 20;
+            var totalCount = all.Count();
+            var items = all.Skip((page - 1) * PageSize).Take(PageSize);
+
+            var vm = new PagedListViewModel<AttendeeListDTO>
+            {
+                Items = items,
+                PageNumber = page,
+                PageSize = PageSize,
+                TotalCount = totalCount
+            };
+
+            return View(vm);
         }
 
         // GET: Attendees/Create

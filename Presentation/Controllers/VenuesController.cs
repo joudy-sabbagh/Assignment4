@@ -1,13 +1,12 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Common;            
 using Application.DTOs;
 using Application.UseCases.Venues;
 using Application.Validators;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Presentation.Models;
 
 namespace Presentation.Controllers
 {
@@ -23,7 +22,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Venues
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             _logger.LogInformation("Fetching all venues");
             var result = await _mediator.Send(new GetAllVenuesQuery());
@@ -32,10 +31,23 @@ namespace Presentation.Controllers
             {
                 _logger.LogWarning("Failed to fetch venues: {Error}", result.Error);
                 ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-                return View(Enumerable.Empty<VenueListDTO>());
+                return View(new PagedListViewModel<VenueListDTO>());
             }
 
-            return View(result.Value);
+            var all = result.Value;
+            const int PageSize = 20;
+            var totalCount = all.Count();
+            var items = all.Skip((page - 1) * PageSize).Take(PageSize);
+
+            var vm = new PagedListViewModel<VenueListDTO>
+            {
+                Items = items,
+                PageNumber = page,
+                PageSize = PageSize,
+                TotalCount = totalCount
+            };
+
+            return View(vm);
         }
 
         // GET: Venues/Create

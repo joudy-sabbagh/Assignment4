@@ -1,4 +1,3 @@
-// Presentation/Controllers/EventsController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Presentation.Models;
 
 namespace Presentation.Controllers
 {
@@ -30,7 +30,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, int page = 1)
         {
             _logger.LogInformation("Fetching all events");
             var result = await _mediator.Send(new GetAllEventsQuery());
@@ -39,7 +39,7 @@ namespace Presentation.Controllers
             {
                 _logger.LogWarning("Failed to fetch events: {Error}", result.Error);
                 ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-                return View(Enumerable.Empty<EventListDTO>());
+                return View(new PagedListViewModel<EventListDTO>());
             }
 
             var list = result.Value!;
@@ -52,7 +52,24 @@ namespace Presentation.Controllers
                 _logger.LogInformation("{Count} events match filter", list.Count);
             }
 
-            return View(list);
+            const int PageSize = 20;
+            var totalCount = list.Count;
+            var items = list
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            var vm = new PagedListViewModel<EventListDTO>
+            {
+                Items = items,
+                PageNumber = page,
+                PageSize = PageSize,
+                TotalCount = totalCount
+            };
+
+            ViewData["Venues"] = await _venueRepo.GetAllAsync();
+            ViewData["SearchString"] = searchString;
+            return View(vm);
         }
 
         // GET: Events/Create

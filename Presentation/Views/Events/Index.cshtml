@@ -1,40 +1,80 @@
-@* Views/Events/Index.cshtml *@
-@model IEnumerable<Application.DTOs.EventListDTO>
+@using Application.DTOs
+@using Domain.Entities       
+@model Presentation.Models.PagedListViewModel<EventListDTO>
 
     @{
     ViewData["Title"] = "Events";
+    var search = ViewData["SearchString"] as string;
+
+    // 1) Cast to the actual type you put into ViewData (Domain.Entities.Venue)
+    var rawVenues = ViewData["Venues"] as IEnumerable<Venue>;
+
+    // 2) Prevent null by falling back to an empty list
+    var venues = rawVenues ?? Enumerable.Empty<Venue>();
     }
 
     <h1>Events</h1>
-    <p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
 
-    <table class="table">
+    <form method="get" class="form-inline mb-3">
+        <input type="text"
+               name="searchString"
+               value="@search"
+               class="form-control mr-2"
+               placeholder="Search by name…" />
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Date</th>
-                <th>Normal Price</th>
-                <th>VIP Price</th>
-                <th>Backstage Price</th>
                 <th>Venue</th>
+                <th>Prices</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var ev in Model)
+            @foreach (var e in Model.Items)
     {
             <tr>
-                <td>@ev.Name</td>
-                <td>@ev.EventDate:yyyy-MM-dd</td>
-                <td>@ev.NormalPrice</td>
-                <td>@ev.VIPPrice</td>
-                <td>@ev.BackstagePrice</td>
-                <td>@ev.VenueName</td>
+                <td>@e.Name</td>
+                <td>@e.EventDate</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@ev.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@ev.Id">Delete</a>
+                    @{
+            // lookup in the non-null 'venues' list
+            var v = venues.FirstOrDefault(vv => vv.Id == e.VenueId);
+                    }
+                    @v?.Name
+                </td>
+                <td>
+                    Normal: @e.NormalPrice<br />
+                    VIP:    @e.VIPPrice<br />
+                    Backstage: @e.BackstagePrice
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
     }
         </tbody>
     </table>
+
+    <nav aria-label="Event pages">
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+    {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-searchString="@search"
+                   asp-route-page="@p">
+                    @p
+                </a>
+            </li>
+    }
+        </ul>
+    </nav>
+
+    <a asp-action="Create" class="btn btn-success">Create New Event</a>

@@ -1,88 +1,96 @@
-@* Views/Tickets/Index.cshtml *@
-@model IEnumerable<Application.DTOs.TicketListDTO>
-    @using Domain.Entities
+@using Application.DTOs
+@using Domain.Entities
+@model Presentation.Models.PagedListViewModel<TicketListDTO>
+
     @{
-    ViewData["Title"] = "Tickets";
+    ViewData["Title"]  = "Tickets";
+    var sortOrder       = ViewData["CurrentSort"]   as string;
+    var eventFilter     = ViewData["SelectedEvent"] as int?;
+    var categoryFilter  = ViewData["SelectedCategory"] as string;
 
-    // carry over filter/sort dropdowns as before
-    var events       = ViewData["Events"]    as IEnumerable<Event>             ?? Enumerable.Empty<Event>();
-    var categoryList = ViewData["CategoryList"] as IEnumerable<TicketCategory>
-                          ?? Enum.GetValues(typeof(TicketCategory)).Cast<TicketCategory>();
+    var events      = (ViewData["Events"]       as IEnumerable<EventListDTO>)
+                        ?? Enumerable.Empty<EventListDTO>();
+    var categories  = (ViewData["CategoryList"] as IEnumerable<TicketCategory>)
+                        ?? Enumerable.Empty<TicketCategory>();
 
-    var request    = ViewContext.HttpContext.Request.Query;
-    var sortOrder  = request["sortOrder"].ToString();
-    var eventF     = request["eventFilter"].ToString();
-    var catF       = request["categoryFilter"].ToString();
-    var newSort    = sortOrder == "price_asc" ? "price_desc" : "price_asc";
-    int? selEvent  = int.TryParse(eventF, out var evv) ? evv : null;
-    TicketCategory? selCat = Enum.TryParse<TicketCategory>(catF, out var ccv) ? ccv : null;
-    string Icon(TicketCategory c) => c switch {
-        TicketCategory.VIP => "👑",
-        TicketCategory.Backstage => "🔑",
-        _ => "🎟️"
-    };
+    var nextSort = sortOrder == "name_asc" ? "name_desc" : "name_asc";
     }
+
 
     <h1>Tickets</h1>
 
-    <form method="get" asp-action="Index" class="form-inline mb-3">
-        <div class="form-group mr-2">
-            <label>Event:</label>
-            <select name="eventFilter" class="form-control ml-2">
-                <option value="">-- All Events --</option>
-                @foreach(var ev in events) {
-                <option value="@ev.Id" selected="@(ev.Id == selEvent)">
-                    @ev.Name
-                </option>
-            }
-            </select>
-        </div>
-        <div class="form-group mr-2">
-            <label>Category:</label>
-            <select name="categoryFilter" class="form-control ml-2">
-                <option value="">-- All Categories --</option>
-                @foreach(var cat in categoryList) {
-                <option value="@cat" selected="@(cat == selCat)">
-                    @cat
-                </option>
-            }
-            </select>
-        </div>
+    <form method="get" class="form-inline mb-3">
+        <select name="eventFilter" class="form-control mr-2">
+            <option value="">All events</option>
+            @foreach (var e in events)
+        {
+            <option value="@e.Id" selected="@(e.Id == eventFilter)">
+                @e.Name
+            </option>
+        }
+        </select>
+
+        <select name="categoryFilter" class="form-control mr-2">
+            <option value="">All categories</option>
+            @foreach (var c in categories)
+        {
+            <option value="@c" selected="@(c.ToString() == categoryFilter)">
+                @c
+            </option>
+        }
+        </select>
+
         <input type="hidden" name="sortOrder" value="@sortOrder" />
-        <button class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 
-    <p><a asp-action="Create" class="btn btn-success">Create Ticket</a></p>
-
-    <table class="table table-bordered">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@newSort"
-                       asp-route-eventFilter="@eventF"
-                       asp-route-categoryFilter="@catF">
-                        Price @(sortOrder=="price_asc"?"↑":sortOrder=="price_desc"?"↓":"")
+                    <a asp-action="Index" asp-route-sortOrder="@nextSort">
+                        Name
                     </a>
                 </th>
-                <th>Category</th>
                 <th>Event</th>
-                <th>Attendee</th>
+                <th>Category</th>
+                <th>Price</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var t in Model) {
+            @foreach (var t in Model.Items)
+        {
             <tr>
-                <td>@t.Price</td>
-                <td>@Icon(Enum.Parse<TicketCategory>(t.Category)) @t.Category</td>
-                <td>@t.EventName</td>
                 <td>@t.AttendeeName</td>
+                <td>@t.EventName</td>
+                <td>@t.Category</td>
+                <td>@t.Price.ToString("C")</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@t.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@t.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
-    }
+        }
         </tbody>
     </table>
+
+    <nav aria-label="Ticket pages">
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-sortOrder="@sortOrder"
+                   asp-route-eventFilter="@eventFilter"
+                   asp-route-categoryFilter="@categoryFilter"
+                   asp-route-page="@p">
+                    @p
+                </a>
+            </li>
+        }
+        </ul>
+    </nav>
+
+    <a asp-action="Create" class="btn btn-success">Create New Ticket</a>
