@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Access denied";
+}
+<h2> Oops you do not have permission to see that.</h2>
+<p>
+    You are signed in as <strong>@User.Identity.Name</strong> but this page is restricted to administrators only.
+</p>
+<p>
+    If you believe this is an error, please contact support or
+    <a asp-controller="Home" asp-action="Index">return home</a>.
+</p>

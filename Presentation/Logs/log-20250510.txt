@@ -123,3 +123,56 @@ Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving 
 2025-05-10 00:29:38 [Information] Fetching all events (with cache)
 2025-05-10 00:29:42 [Information] Visited Home Page
 2025-05-10 00:29:45 [Information] Visited Home Page
+2025-05-10 00:57:43 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-10 00:57:48 [Information] Visited Home Page
+2025-05-10 00:57:50 [Information] Visited Home Page
+2025-05-10 00:57:55 [Information] Visited Home Page
+2025-05-10 00:58:30 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-10 00:58:45 [Information] Visited Home Page
+2025-05-10 00:58:46 [Information] Fetching all events (with cache)
+2025-05-10 00:58:47 [Information] Handling GetAllEventsQuery
+2025-05-10 00:58:47 [Information] Retrieved 3 events
+2025-05-10 00:58:48 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-10 00:58:48 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-10 00:58:48 [Information] Retrieved 3 tickets
+2025-05-10 00:58:49 [Information] Fetching all venues (with cache)
+2025-05-10 00:58:49 [Information] Handling GetAllVenuesQuery
+2025-05-10 00:58:49 [Information] Retrieved 2 venues
+2025-05-10 00:58:50 [Information] Fetching all attendees (with cache)
+2025-05-10 00:58:50 [Information] Handling GetAllAttendeesQuery
+2025-05-10 00:58:50 [Information] Retrieved 2 attendees
+2025-05-10 00:58:53 [Information] Fetching all venues (with cache)
+2025-05-10 00:58:54 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-10 00:58:57 [Information] Rendering Create Ticket form
+2025-05-10 00:59:00 [Information] Received CreateTicket request for CreateTicketDTO { EventId: 1, AttendeeId: 3, TicketType: "Normal" }
+2025-05-10 00:59:00 [Information] Ticket purchased with ID 20
+2025-05-10 00:59:00 [Information] Ticket purchased with ID 20
+2025-05-10 00:59:00 [Information] Ticket created with Id 20
+2025-05-10 00:59:02 [Information] Fetching tickets (sort=null, event=null, category=null, page=1)
+2025-05-10 00:59:02 [Information] Handling GetAllTicketsQuery (sort=null, event=null, category=null)
+2025-05-10 00:59:02 [Information] Retrieved 4 tickets
+2025-05-10 00:59:06 [Information] Visited Home Page
+2025-05-10 01:06:21 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-10 01:06:40 [Information] Visited Home Page
+2025-05-10 01:06:53 [Information] Login attempt for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:06:53 [Information] Generating JWT for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:06:53 [Information] JWT generated for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:06:53 [Information] Login successful for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:06:53 [Information] Visited Home Page
+2025-05-10 01:07:53 [Warning] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+2025-05-10 01:08:10 [Information] Visited Home Page
+2025-05-10 01:08:12 [Information] Logout for null
+2025-05-10 01:08:12 [Information] Visited Home Page
+2025-05-10 01:08:22 [Information] Login attempt for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:22 [Information] Generating JWT for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:22 [Information] JWT generated for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:22 [Information] Login successful for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:22 [Information] Visited Home Page
+2025-05-10 01:08:24 [Information] Logout for null
+2025-05-10 01:08:24 [Information] Visited Home Page
+2025-05-10 01:08:29 [Information] Login attempt for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:29 [Information] Generating JWT for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:29 [Warning] JWT generation failed for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:29 [Warning] Invalid credentials for "joudy.f.sabbagh@gmail.com"
+2025-05-10 01:08:32 [Information] Visited Home Page
+2025-05-10 01:08:36 [Information] Visited Home Page

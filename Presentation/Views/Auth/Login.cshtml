@@ -1,22 +1,28 @@
-<!-- Presentation/Views/Auth/Login.cshtml -->
 @model Application.DTOs.LoginRequest
 @{
     ViewData["Title"] = "Log in";
 }
 <h2>Log in</h2>
+
 <form asp-action="Login" method="post">
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    <div>
-        <input asp-for="RememberMe" type="checkbox" />
-        <label asp-for="RememberMe">Remember me</label>
-    </div>
+
     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-    <button type="submit">Log in</button>
+    <button type="submit" class="btn btn-primary">Log in</button>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
