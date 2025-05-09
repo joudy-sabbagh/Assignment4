@@ -1,3 +1,4 @@
+// Presentation/Controllers/TicketsController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,17 +7,20 @@ using Application.Common;
 using Application.DTOs;
 using Application.UseCases.Tickets;
 using Application.Validators;
-using Domain.Interfaces;
 using Domain.Entities;
+using Domain.Interfaces;
+using Application.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Application.Interfaces;
 using Presentation.Models;
 
 namespace Presentation.Controllers
 {
+    // Require any authenticated user
+    [Authorize]
     public class TicketsController : Controller
     {
         private const string CacheKey = "AllTickets";
@@ -62,30 +66,14 @@ namespace Presentation.Controllers
             ViewData["SelectedEvent"] = eventFilter;
             ViewData["SelectedCategory"] = categoryFilter;
 
-            // Decide whether to use cache (only for the unfiltered, default view)
             bool useCache = string.IsNullOrEmpty(sortOrder)
                             && eventFilter == null
                             && string.IsNullOrEmpty(categoryFilter);
 
             List<TicketListDTO> all;
-            if (useCache)
+            if (useCache && _cache.TryGetValue(CacheKey, out all))
             {
-                if (!_cache.TryGetValue(CacheKey, out all))
-                {
-                    var result = await _mediator.Send(
-                        new GetAllTicketsQuery(sortOrder, eventFilter, categoryFilter)
-                    );
-
-                    if (!result.IsSuccess)
-                    {
-                        _logger.LogWarning("Failed to fetch tickets: {Error}", result.Error);
-                        ModelState.AddModelError(string.Empty, result.Error ?? "Unknown error");
-                        return View(new PagedListViewModel<TicketListDTO>());
-                    }
-
-                    all = result.Value!.ToList();
-                    _cache.Set(CacheKey, all, TimeSpan.FromMinutes(5));
-                }
+                // cached
             }
             else
             {
@@ -101,6 +89,8 @@ namespace Presentation.Controllers
                 }
 
                 all = result.Value!.ToList();
+                if (useCache)
+                    _cache.Set(CacheKey, all, TimeSpan.FromMinutes(5));
             }
 
             const int PageSize = 20;
@@ -121,6 +111,8 @@ namespace Presentation.Controllers
             return View(vm);
         }
 
+        // Only Admins may create tickets
+        [Authorize(Roles = "Admin")]
         // GET: Tickets/Create
         public async Task<IActionResult> Create()
         {
@@ -132,8 +124,9 @@ namespace Presentation.Controllers
             return View();
         }
 
-        // POST: Tickets/Create
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Tickets/Create
         public async Task<IActionResult> Create(CreateTicketDTO dto)
         {
             _logger.LogInformation("Received CreateTicket request for {@Dto}", dto);
@@ -155,32 +148,27 @@ namespace Presentation.Controllers
             var ticketId = await _mediator.Send(new CreateTicketCommand(dto));
             _logger.LogInformation("Ticket created with Id {TicketId}", ticketId);
 
-            // Invalidate cache so the new ticket appears immediately
             _cache.Remove(CacheKey);
 
+            // send confirmation email
             var attendee = await _attendeeRepo.GetByIdAsync(dto.AttendeeId);
             var ev = await _eventRepo.GetByIdAsync(dto.EventId);
             if (attendee != null && ev != null)
             {
-                var name = attendee.Name;
-                var email = attendee.Email.Value;
-                var eventName = ev.Name;
-                var tier = dto.TicketType.ToString();
-
-                var textContent = $@"Hello {name},
+                var textContent = $@"Hello {attendee.Name},
 
 Thank you for booking with us!
 
-Event       : {eventName}
-Ticket Tier : {tier}
+Event       : {ev.Name}
+Ticket Tier : {dto.TicketType}
 Ticket ID   : {ticketId}
 
 Best regards,
 Event Manager Team
 ";
                 await _emailService.SendEmailAsync(
-                    toEmail: email,
-                    subject: $"Your {eventName} Ticket Confirmation",
+                    toEmail: attendee.Email.Value,
+                    subject: $"Your {ev.Name} Ticket Confirmation",
                     plainTextContent: textContent,
                     htmlContent: null
                 );
@@ -189,14 +177,16 @@ Event Manager Team
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may edit tickets
+        [Authorize(Roles = "Admin")]
         // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Ticket {Id}", id);
+
             var result = await _mediator.Send(
                 new GetAllTicketsQuery("", null, null)
             );
-
             if (!result.IsSuccess)
             {
                 _logger.LogWarning("Failed to fetch tickets for edit: {Error}", result.Error);
@@ -224,8 +214,9 @@ Event Manager Team
             });
         }
 
-        // POST: Tickets/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Tickets/Edit/5
         public async Task<IActionResult> Edit(int id, UpdateTicketDTO dto)
         {
             _logger.LogInformation("Received UpdateTicket request for {Id}: {@Dto}", id, dto);
@@ -249,20 +240,20 @@ Event Manager Team
             await _mediator.Send(new UpdateTicketCommand(dto));
             _logger.LogInformation("Ticket {Id} updated successfully", id);
 
-            // Invalidate cache so edits appear immediately
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may delete tickets
+        [Authorize(Roles = "Admin")]
         // GET: Tickets/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Ticket {Id}", id);
+
             var result = await _mediator.Send(
                 new GetAllTicketsQuery("", null, null)
             );
-
             if (!result.IsSuccess)
             {
                 _logger.LogWarning("Failed to fetch tickets for deletion: {Error}", result.Error);
@@ -276,17 +267,16 @@ Event Manager Team
             return View(item);
         }
 
-        // POST: Tickets/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Tickets/Delete/5
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             _logger.LogInformation("Deleting Ticket {Id}", id);
             await _mediator.Send(new DeleteTicketCommand(id));
             _logger.LogInformation("Ticket {Id} deleted", id);
 
-            // Invalidate cache so deletion appears immediately
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
     }

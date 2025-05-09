@@ -1,15 +1,19 @@
+// Infrastructure/Data/AppDbContext.cs
 using Domain.Entities;
 using Domain.ValueObjects;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext
+        : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         { }
 
+        // your existing entities
         public DbSet<Attendee> Attendees { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
@@ -17,7 +21,10 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // first let Identity configure its tables
             base.OnModelCreating(modelBuilder);
+
+            // then your domain model configuration
 
             // primary keys
             modelBuilder.Entity<Attendee>().HasKey(a => a.Id);

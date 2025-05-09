@@ -1,3 +1,4 @@
+// Presentation/Controllers/VenuesController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Application.DTOs;
 using Application.UseCases.Venues;
 using Application.Validators;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -13,6 +15,8 @@ using Presentation.Models;
 
 namespace Presentation.Controllers
 {
+    // Require any authenticated user
+    [Authorize]
     public class VenuesController : Controller
     {
         private const string CacheKey = "AllVenues";
@@ -66,6 +70,8 @@ namespace Presentation.Controllers
             return View(vm);
         }
 
+        // Only Admins may create venues
+        [Authorize(Roles = "Admin")]
         // GET: Venues/Create
         public IActionResult Create()
         {
@@ -73,8 +79,9 @@ namespace Presentation.Controllers
             return View();
         }
 
-        // POST: Venues/Create
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Venues/Create
         public async Task<IActionResult> Create(CreateVenueDTO dto)
         {
             _logger.LogInformation("Received CreateVenue request for {@Dto}", dto);
@@ -91,18 +98,17 @@ namespace Presentation.Controllers
             var newId = await _mediator.Send(new CreateVenueCommand(dto));
             _logger.LogInformation("Venue created with Id {VenueId}", newId);
 
-            // Invalidate cache
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may edit venues
+        [Authorize(Roles = "Admin")]
         // GET: Venues/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Venue {Id}", id);
 
-            // We could cache individual lookups, but for simplicity reuse the same query
             var result = await _mediator.Send(new GetAllVenuesQuery());
             if (!result.IsSuccess)
             {
@@ -126,8 +132,9 @@ namespace Presentation.Controllers
             });
         }
 
-        // POST: Venues/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Venues/Edit/5
         public async Task<IActionResult> Edit(int id, UpdateVenueDTO dto)
         {
             _logger.LogInformation("Received UpdateVenue request for {Id}: {@Dto}", id, dto);
@@ -147,12 +154,12 @@ namespace Presentation.Controllers
             await _mediator.Send(new UpdateVenueCommand(dto));
             _logger.LogInformation("Venue {Id} updated successfully", id);
 
-            // Invalidate cache
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may delete venues
+        [Authorize(Roles = "Admin")]
         // GET: Venues/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
@@ -167,13 +174,17 @@ namespace Presentation.Controllers
 
             var item = result.Value!.FirstOrDefault(v => v.Id == id);
             if (item == null)
+            {
+                _logger.LogWarning("Venue {Id} not found for deletion", id);
                 return NotFound();
+            }
 
             return View(item);
         }
 
-        // POST: Venues/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Venues/Delete/5
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             _logger.LogInformation("Deleting venue {Id}", id);
@@ -181,9 +192,7 @@ namespace Presentation.Controllers
             await _mediator.Send(new DeleteVenueCommand(id));
             _logger.LogInformation("Venue {Id} deleted", id);
 
-            // Invalidate cache
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
     }

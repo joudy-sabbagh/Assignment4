@@ -1,3 +1,4 @@
+// Presentation/Controllers/AttendeesController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Application.DTOs;
 using Application.UseCases.Attendees;
 using Application.Validators;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -13,6 +15,8 @@ using Presentation.Models;
 
 namespace Presentation.Controllers
 {
+    // Require any authenticated user to view attendees
+    [Authorize]
     public class AttendeesController : Controller
     {
         private const string CacheKey = "AllAttendees";
@@ -32,6 +36,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Attendees
+        [HttpGet]
         public async Task<IActionResult> Index(int page = 1)
         {
             _logger.LogInformation("Fetching all attendees (with cache)");
@@ -66,6 +71,8 @@ namespace Presentation.Controllers
             return View(vm);
         }
 
+        // Only Admins may create attendees
+        [Authorize(Roles = "Admin")]
         // GET: Attendees/Create
         public IActionResult Create()
         {
@@ -73,8 +80,9 @@ namespace Presentation.Controllers
             return View();
         }
 
-        // POST: Attendees/Create
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Attendees/Create
         public async Task<IActionResult> Create(CreateAttendeeDTO dto)
         {
             _logger.LogInformation("Received Create request for {@Dto}", dto);
@@ -97,6 +105,8 @@ namespace Presentation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may edit attendees
+        [Authorize(Roles = "Admin")]
         // GET: Attendees/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
@@ -129,8 +139,9 @@ namespace Presentation.Controllers
             });
         }
 
-        // POST: Attendees/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Attendees/Edit/5
         public async Task<IActionResult> Edit(int id, UpdateAttendeeDTO dto)
         {
             _logger.LogInformation("Received Edit request: {Id}", id);
@@ -153,6 +164,8 @@ namespace Presentation.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may delete attendees
+        [Authorize(Roles = "Admin")]
         // GET: Attendees/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
@@ -176,8 +189,9 @@ namespace Presentation.Controllers
             return View(item);
         }
 
-        // POST: Attendees/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Attendees/Delete/5
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             _logger.LogInformation("Deleting Attendee {Id}", id);

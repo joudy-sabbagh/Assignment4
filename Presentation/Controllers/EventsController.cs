@@ -1,3 +1,4 @@
+// Presentation/Controllers/EventsController.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Application.UseCases.Events;
 using Application.Validators;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -15,6 +17,8 @@ using Presentation.Models;
 
 namespace Presentation.Controllers
 {
+    // All actions require an authenticated user
+    [Authorize]
     public class EventsController : Controller
     {
         private const string CacheKey = "AllEvents";
@@ -41,7 +45,6 @@ namespace Presentation.Controllers
         {
             _logger.LogInformation("Fetching all events (with cache)");
 
-            // Try to get the full list from cache
             if (!_cache.TryGetValue(CacheKey, out List<EventListDTO> list))
             {
                 var result = await _mediator.Send(new GetAllEventsQuery());
@@ -56,7 +59,6 @@ namespace Presentation.Controllers
                 _cache.Set(CacheKey, list, TimeSpan.FromMinutes(5));
             }
 
-            // Apply filter if needed
             if (!string.IsNullOrEmpty(searchString))
             {
                 _logger.LogInformation("Filtering events by '{Filter}'", searchString);
@@ -66,7 +68,6 @@ namespace Presentation.Controllers
                 _logger.LogInformation("{Count} events match filter", list.Count);
             }
 
-            // Paging
             const int PageSize = 20;
             var totalCount = list.Count;
             var items = list
@@ -88,6 +89,8 @@ namespace Presentation.Controllers
             return View(vm);
         }
 
+        // Only Admins may create events
+        [Authorize(Roles = "Admin")]
         // GET: Events/Create
         public async Task<IActionResult> Create()
         {
@@ -96,8 +99,9 @@ namespace Presentation.Controllers
             return View();
         }
 
-        // POST: Events/Create
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Events/Create
         public async Task<IActionResult> Create(CreateEventDTO dto)
         {
             _logger.LogInformation("Received CreateEvent request for {@Dto}", dto);
@@ -116,16 +120,17 @@ namespace Presentation.Controllers
             var id = await _mediator.Send(new CreateEventCommand(dto));
             _logger.LogInformation("Event created with Id {EventId}", id);
 
-            // invalidate cache so new event shows up
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may edit events
+        [Authorize(Roles = "Admin")]
         // GET: Events/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Rendering Edit form for Event {Id}", id);
+
             var result = await _mediator.Send(new GetAllEventsQuery());
             if (!result.IsSuccess)
             {
@@ -153,8 +158,9 @@ namespace Presentation.Controllers
             });
         }
 
-        // POST: Events/Edit/5
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Events/Edit/5
         public async Task<IActionResult> Edit(int id, UpdateEventDTO dto)
         {
             _logger.LogInformation("Received UpdateEvent request for {Id}: {@Dto}", id, dto);
@@ -179,16 +185,17 @@ namespace Presentation.Controllers
             await _mediator.Send(new UpdateEventCommand(dto));
             _logger.LogInformation("Event {Id} updated successfully", id);
 
-            // invalidate cache so edits reflect
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Admins may delete events
+        [Authorize(Roles = "Admin")]
         // GET: Events/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Rendering Delete confirmation for Event {Id}", id);
+
             var result = await _mediator.Send(new GetAllEventsQuery());
             if (!result.IsSuccess)
             {
@@ -206,17 +213,16 @@ namespace Presentation.Controllers
             return View(item);
         }
 
-        // POST: Events/Delete/5
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        // POST: Events/Delete/5
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             _logger.LogInformation("Deleting event {Id}", id);
             await _mediator.Send(new DeleteEventCommand(id));
             _logger.LogInformation("Event {Id} deleted", id);
 
-            // invalidate cache so deletion reflects
             _cache.Remove(CacheKey);
-
             return RedirectToAction(nameof(Index));
         }
     }

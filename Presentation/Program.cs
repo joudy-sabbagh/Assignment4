@@ -1,16 +1,24 @@
+// Presentation/Program.cs
+using System;
 using System.Globalization;
+using System.Text;
 using Application.Mapping;
 using Application.UseCases.Attendees;
 using Application.UseCases.Tickets;
+using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Application.Interfaces;
+using Infrastructure.Services;
 using Domain.Services;
-
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,11 +54,44 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-builder.Services
-    .AddScoped<Application.Interfaces.IEmailService, Infrastructure.Services.SendGridEmailService>();
+// 7. Identity
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(opts =>
+{
+    // password policy (tweak as needed)
+    opts.Password.RequireDigit = true;
+    opts.Password.RequireUppercase = false;
+    opts.Password.RequireNonAlphanumeric = false;
+    opts.Password.RequiredLength = 6;
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
-// 7. DI
-// Removed ITicketPricingService registration
+// 8. JWT Authentication
+var jwt = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwt["Key"]!);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(opts =>
+    {
+        opts.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// 9. DI for your services/repositories
+builder.Services.AddScoped<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IEventValidationService, EventValidationService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();
@@ -61,30 +102,59 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-// In dev, show the detailed page; otherwise use our “/Error” handler
+// error pages
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 else
 {
-    // any exception goes to /Error
     app.UseExceptionHandler("/Error");
-    // HSTS in production
     app.UseHsts();
 }
 
-// Turn 404/403/etc into our ErrorController too
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
-
-// The rest of your pipeline
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
+// **Enable auth middleware**
+app.UseAuthentication();
 app.UseAuthorization();
 
+// your MVC routes
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // 1) ensure roles exist
+    foreach (var roleName in new[] { "Admin", "User" })
+        if (!await roleMgr.RoleExistsAsync(roleName))
+            await roleMgr.CreateAsync(new ApplicationRole { Name = roleName });
+
+    // 2) ensure an admin user exists
+    const string adminEmail = "Joudy.f.sabbagh@gmail.com";
+    var admin = await userMgr.FindByEmailAsync(adminEmail);
+    if (admin == null)
+    {
+        admin = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FirstName = "System",
+            LastName = "Admin",
+            DateOfBirth = DateTime.UtcNow
+        };
+        var result = await userMgr.CreateAsync(admin, "Admin123!");
+        if (result.Succeeded)
+            await userMgr.AddToRoleAsync(admin, "Admin");
+    }
+}
 
 app.Run();
